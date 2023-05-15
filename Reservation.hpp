@@ -1,8 +1,9 @@
 #pragma once
 #include "Guest.hpp"
+#include "Accommodation.hpp"
 #include <string>
 
-class Reservation{
+class Reservation : public Accommodation{
 private:
     int roomNumber;
     std::string checkInDate;
@@ -12,6 +13,7 @@ private:
     std::vector<Guest*> guests;
 
 public:
+    Reservation(const std::string &checkInDate, const std::string &checkOutDate);
     Reservation(int roomNumber, const std::string &checkInDate, const std::string &checkOutDate, const std::string &note, unsigned int numGuests);
     ~Reservation();
 
@@ -30,7 +32,7 @@ public:
     unsigned int getNumberOfGuests() const;
     void setNumberOfGuests(unsigned int roomNumber);
 
-    std::vector<Guest*> getGuests() const;
-    void addGuest(const Guest* guest);
+    virtual std::vector<Guest*> getGuests() const override;
+    virtual void addGuest(Guest* guest) override;
 
 };

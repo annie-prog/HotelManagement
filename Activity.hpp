@@ -1,21 +1,20 @@
 #pragma once
 #include "Guest.hpp"
+#include "Accommodation.hpp"
 #include <vector>
 #include <string>
 
-class Activity{
-    private:
+class Activity : public Accommodation{
+private:
     std::string name;
     std::vector<Guest*> guests;
-
-    public:
+public:
     Activity(const std::string &name);
     ~Activity();
 
     const std::string getName() const;
     void setName(const std::string &name);
 
-    void addGuest(const Guest* guest);
-    std::vector<Guest*> getGuests() const;
-
+    virtual void addGuest(Guest* guest) override;
+    virtual std::vector<Guest*> getGuests() const override;
 };
