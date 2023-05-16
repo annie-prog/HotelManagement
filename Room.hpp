@@ -2,25 +2,42 @@
 #include "Guest.hpp"
 #include "Reservation.hpp"
 #include "Activity.hpp"
-#include <vector>
+#include "Accommodation.hpp"
 
-class Room{
-private:
+class Room : public Accommodation{
+protected:
     int number;   
     unsigned int numBeds;
-    std::vector<Guest> guests;
-    std::vector<Reservation> reservations;
-    std::vector<Activity> activities;
-
+    Guest** guests;
+    unsigned int guestsCount;
+    Reservation** reservations;
+    unsigned int reservationsCount;
+    Activity** activities;
+    unsigned int activitiesCount;
 public:
+    Room();
     Room(int number, unsigned int numBeds);
+    ~Room();
     int getNumber() const;
     unsigned int getNumberOfBeds() const;
-    std::vector<Guest> getGuests() const;
-    std::vector<Reservation> getReservations() const;
-    std::vector<Activity> getActivities() const;
-    void addGuest(const Guest& guest);
-    void addReservation(const Reservation& reservation);
-    void addActivity(const Activity& activity);
     
+    virtual Guest** getGuests() const override;
+    unsigned int getGuestsCount() const;
+
+    virtual Reservation** getReservations() const;
+    unsigned int getReservationsCount() const;
+
+    virtual Activity** getActivities() const;
+    unsigned int getActivitiesCount() const;
+
+    void addGuest(Guest* guest);
+    void addReservation(Reservation* reservation);
+    void cancelReservation(const std::string& checkIn, const std::string& checkOut);
+    void addActivity(Activity* activity);
+
+    bool isReservedInPeriod(const std::string& from, const std::string& to) const;
+    void addGuestToActivity(const std::string& activityName, Guest* guest);
+    void clearGuests();
+
+    void printRoomUsageReport(const std::string& from, const std::string& to) const;
 };

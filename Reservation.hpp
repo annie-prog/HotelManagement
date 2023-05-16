@@ -10,8 +10,9 @@ private:
     std::string checkOutDate;
     std::string note;
     unsigned int numGuests;
-    std::vector<Guest*> guests;
+    Guest **guests;
 
+    void deallocate();
 public:
     Reservation(const std::string &checkInDate, const std::string &checkOutDate);
     Reservation(int roomNumber, const std::string &checkInDate, const std::string &checkOutDate, const std::string &note, unsigned int numGuests);
@@ -30,9 +31,9 @@ public:
     void checkNote(const std::string &note);
 
     unsigned int getNumberOfGuests() const;
-    void setNumberOfGuests(unsigned int roomNumber);
+    void setNumberOfGuests(unsigned int numGuests);
 
-    virtual std::vector<Guest*> getGuests() const override;
+    virtual Guest** getGuests() const override;
     virtual void addGuest(Guest* guest) override;
 
 };

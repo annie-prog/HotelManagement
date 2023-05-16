@@ -1,5 +1,6 @@
 #include "Guest.hpp"
 
+Guest::~Guest() = default;
 Guest::Guest(const std::string &firstName, const std::string &lastName, const std::string &phoneNumber)
     :firstName(firstName), lastName(lastName), phoneNumber(phoneNumber) {}
 

@@ -7,7 +7,8 @@
 class Activity : public Accommodation{
 private:
     std::string name;
-    std::vector<Guest*> guests;
+    Guest** guests;
+    unsigned int guestsCount;
 public:
     Activity(const std::string &name);
     ~Activity();
@@ -16,5 +17,5 @@ public:
     void setName(const std::string &name);
 
     virtual void addGuest(Guest* guest) override;
-    virtual std::vector<Guest*> getGuests() const override;
+    virtual Guest** getGuests() const override;
 };

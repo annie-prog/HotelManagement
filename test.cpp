@@ -6,53 +6,52 @@ int main() {
     Room* room2 = new Room(102, 1);
     Room* room3 = new Room(201, 3);
 
-    HotelSystem hotelSystem({ room1, room2, room3 });
+    HotelSystem hotel;
 
-    std::cout << "Initial rooms:" << std::endl;
-    hotelSystem.printRooms();
+    hotel.addRoom(room1);
+    hotel.addRoom(room2);
+    hotel.addRoom(room3);
 
-    Guest* guest1 = new Guest("John", "Doe", "0882750588");
-    Guest* guest2 = new Guest("Jane", "Smith", "0889345678");
-    room1->addGuest(guest1);
-    room2->addGuest(guest2);
+    std::cout << "All Rooms:" << std::endl;
+    hotel.printRooms();
+    std::cout << std::endl;
 
-    
+    std::cout << "Making reservations..." << std::endl;
+    hotel.makeReservation(101, "2023-05-20", "2023-05-25", "Reservation 1", 2);
+    hotel.makeReservation(102, "2023-05-22", "2023-05-24", "Reservation 2", 1);
+    hotel.makeReservation(201, "2023-05-23", "2023-05-26", "Reservation 3", 3);
+    std::cout << std::endl;
 
-    hotelSystem.addActivity("Swimming");
-    hotelSystem.addActivity("Gym");
+    std::cout << "Available Rooms:" << std::endl;
+    hotel.printAvailableRooms("2023-05-20", "2023-05-22");
+    std::cout << std::endl;
 
-    hotelSystem.addGuestToActivity("Swimming", guest1);
-    hotelSystem.addGuestToActivity("Gym", guest2);
+    std::cout << "Room Activities:" << std::endl;
+    hotel.printRoomActivities(101);
+    std::cout << std::endl;
 
-    std::cout << "Updated rooms:" << std::endl;
-    hotelSystem.printRooms();
+    std::cout << "Adding activity and guest to room activity..." << std::endl;
+    hotel.addActivity("Swimming");
+    Guest* guest = new Guest("John", "Doe", "0882750588");
+    hotel.addGuestToRoomActivity(101, "Swimming", guest);
+    std::cout << std::endl;
 
-    hotelSystem.printActivities();
+    std::cout << "Room Activities:" << std::endl;
+    hotel.printRoomActivities(101);
+    std::cout << std::endl;
 
-    // Print guests
-    hotelSystem.printGuests();
+    std::cout << "Checking out room..." << std::endl;
+    hotel.checkout(101);
+    std::cout << std::endl;
 
-    hotelSystem.makeReservation(201, "2023-06-01", "2023-06-05", "Vacation", 2);
+    std::cout << "Room Activities:" << std::endl;
+    hotel.printRoomActivities(101);
+    std::cout << std::endl;
 
-    hotelSystem.printAvailableRooms("2023-06-01", "2023-06-05");
-
-    hotelSystem.cancelReservation(201, "2023-06-01", "2023-06-05");
-
-    std::cout << "Updated rooms:" << std::endl;
-    hotelSystem.printRooms();
-
-    hotelSystem.checkout(101);
-    hotelSystem.checkout(102);
-
-    // Print updated rooms
-    std::cout << "Updated rooms:" << std::endl;
-    hotelSystem.printRooms();
-
-    delete guest1;
-    delete guest2;
-    delete room1;
-    delete room2;
-    delete room3;
+    delete[] guest;
+    delete[] room1;
+    delete[] room2;
+    delete[] room3;
 
     return 0;
 }

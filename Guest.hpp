@@ -8,6 +8,7 @@ private:
     std::string phoneNumber;
 public:
     Guest(const std::string &firstName, const std::string &lastName, const std::string &phoneNumber);
+    ~Guest();
     std::string getFirstName() const;
     std::string getLastName() const;
     std::string getPhoneNumber() const;
