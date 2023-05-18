@@ -3,7 +3,7 @@
 #include "Reservation.hpp"
 
 Reservation::Reservation(const std::string& checkInDate, const std::string& checkOutDate) : roomNumber(0), checkInDate(checkInDate), checkOutDate(checkOutDate), note(""), numGuests(0), guests(nullptr) {}
-
+Reservation::Reservation(const std::string &checkInDate, const std::string &checkOutDate, const std::string &note) : checkInDate(checkInDate), checkOutDate(checkOutDate), note(note){}
 Reservation::Reservation(int roomNumber, const std::string& checkInDate, const std::string& checkOutDate, const std::string& note, unsigned int numGuests) : roomNumber(roomNumber), checkInDate(checkInDate), checkOutDate(checkOutDate), note(note), numGuests(numGuests) {
     this->guests = new Guest*[numGuests];
 }

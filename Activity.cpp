@@ -1,4 +1,5 @@
 #include "Activity.hpp"
+#include <iostream>
 
 Activity::Activity(const std::string& name) : name(name), guests(nullptr), guestsCount(0) {}
 
@@ -29,4 +30,19 @@ void Activity::addGuest(Guest* guest) {
 }
 Guest** Activity::getGuests() const {
     return this->guests;
+}
+unsigned int Activity::getGuestsCount() const{
+    return this->guestsCount;
+}
+void Activity::printGuests() const {
+    if (guestsCount != 0) {
+        for (unsigned int i = 0; i < guestsCount; i++) {
+            std::cout << "Guest Name: " << guests[i]->getFirstName() << " " << guests[i]->getLastName() << std::endl;
+            std::cout << "Guest Phone: " << guests[i]->getPhoneNumber() << std::endl;
+            std::cout << "------------------------" << std::endl;
+        }
+    } 
+    else {
+        std::cout << "No guests for this activity." << std::endl;
+    }
 }

@@ -1,5 +1,6 @@
 #include "Room.hpp"
 #include <iostream>
+#include <ctime>
 
 Room::Room() : number(0), numBeds(0), guests(nullptr), 
     guestsCount(0), reservations(nullptr), reservationsCount(0), activities(nullptr), activitiesCount(0) {}
@@ -101,7 +102,20 @@ void Room::clearGuests() {
     for (unsigned int i = 0; i < guestsCount; i++) {
         delete guests[i];
     }
+    delete[] guests;
+    guests = nullptr;
     guestsCount = 0;
+}
+
+void Room::clearReservation() {
+    if (reservationsCount > 0) {
+        for (unsigned int i = 0; i < reservationsCount; i++) {
+            delete reservations[i];
+        }
+        delete[] reservations;
+        reservations = nullptr;
+        reservationsCount = 0;
+    }
 }
 void Room::printRoomUsageReport(const std::string& from, const std::string& to) const {
     std::cout << "Room " << number << " usage report:" << std::endl;
@@ -121,3 +135,79 @@ void Room::printRoomUsageReport(const std::string& from, const std::string& to) 
     }
     std::cout << "-------------------------------------" << std::endl;
 }
+int Room::getUsageDays(const std::string& from, const std::string& to) const {
+    int usageDays = 0;
+    for (int i = 0; i < this->reservationsCount; i++) {
+        Reservation* reservation = this->reservations[i];
+        if (reservation->getCheckInDate() <= to && reservation->getCheckOutDate() >= from) {
+            std::string reservationStartDate = (reservation->getCheckInDate() > from) ? reservation->getCheckInDate() : from;
+            std::string reservationEndDate = (reservation->getCheckOutDate() < to) ? reservation->getCheckOutDate() : to;
+
+            int startYear = std::stoi(reservationStartDate.substr(0, 4));
+            int startMonth = std::stoi(reservationStartDate.substr(5, 2));
+            int startDay = std::stoi(reservationStartDate.substr(8, 2));
+
+            int endYear = std::stoi(reservationEndDate.substr(0, 4));
+            int endMonth = std::stoi(reservationEndDate.substr(5, 2));
+            int endDay = std::stoi(reservationEndDate.substr(8, 2));
+
+            std::tm startTm = {0};
+            startTm.tm_year = startYear - 1900; 
+            startTm.tm_mon = startMonth - 1;    
+            startTm.tm_mday = startDay;        
+
+            std::tm endTm = {0};
+            endTm.tm_year = endYear - 1900; 
+            endTm.tm_mon = endMonth - 1;   
+            endTm.tm_mday = endDay;         
+
+            std::time_t startTime = std::mktime(&startTm);
+            std::time_t endTime = std::mktime(&endTm);
+
+            std::time_t difference = endTime - startTime;
+
+            int differenceDays = difference / (60 * 60 * 24);
+
+            usageDays += differenceDays;
+        }
+    }
+    return usageDays + 1;
+}
+void Room::moveGuestsFromRoom(Room* sourceRoom) {
+    for (unsigned int i = 0; i < sourceRoom->guestsCount; i++) {
+        this->addGuest(sourceRoom->guests[i]);
+    }
+
+    sourceRoom->clearGuests();
+}
+void Room::checkout() {
+    if (this->guestsCount == 0) {
+        std::cout << "No guests in the room." << std::endl;
+        return;
+    }
+
+    for (unsigned int i = 0; i < this->guestsCount; i++) {
+        delete this->guests[i];
+    }
+    delete[] this->guests;
+    this->guests = nullptr;
+    this->guestsCount = 0;
+
+    this->guests = new Guest*[this->guestsCount];
+
+    std::cout << "Room checked out successfully." << std::endl;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

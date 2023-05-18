@@ -18,4 +18,6 @@ public:
 
     virtual void addGuest(Guest* guest) override;
     virtual Guest** getGuests() const override;
+    unsigned int getGuestsCount() const;
+    void printGuests() const;
 };

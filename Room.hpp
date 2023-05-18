@@ -38,6 +38,10 @@ public:
     bool isReservedInPeriod(const std::string& from, const std::string& to) const;
     void addGuestToActivity(const std::string& activityName, Guest* guest);
     void clearGuests();
+    void clearReservation();
+    void checkout();
 
     void printRoomUsageReport(const std::string& from, const std::string& to) const;
+    int getUsageDays(const std::string& from, const std::string& to) const;
+    void moveGuestsFromRoom(Room* sourceRoom);
 };

@@ -15,6 +15,7 @@ private:
     void deallocate();
 public:
     Reservation(const std::string &checkInDate, const std::string &checkOutDate);
+    Reservation(const std::string &checkInDate, const std::string &checkOutDate, const std::string &note);
     Reservation(int roomNumber, const std::string &checkInDate, const std::string &checkOutDate, const std::string &note, unsigned int numGuests);
     ~Reservation();
 

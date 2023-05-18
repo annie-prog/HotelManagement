@@ -1,7 +1,16 @@
 #include "HotelSystem.hpp"
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
+HotelSystem* HotelSystem::instance = nullptr;
+
+HotelSystem* HotelSystem::getInstance(){
+    if(instance == nullptr){
+        instance = new HotelSystem();
+    }
+    return instance;
+}
 HotelSystem::HotelSystem(Room** rooms, unsigned int roomCount): rooms(rooms), roomCount(0) {}
 HotelSystem::HotelSystem() : rooms(nullptr), roomCount(0) {}
 HotelSystem::~HotelSystem() {
@@ -81,6 +90,27 @@ void HotelSystem::printRooms() const {
         std::cout << "------------------------" << std::endl;
     }
 }
+void HotelSystem::printActivityGuests(const std::string& activityName) const {
+    bool activityFound = false;
+
+    for (unsigned int i = 0; i < activitiesCount; i++) {
+        if (activities[i]->getName() == activityName) {
+            activityFound = true;
+            Guest** guests = activities[i]->getGuests();
+            unsigned int guestsCount = activities[i]->getGuestsCount();
+
+            std::cout << "Guests for activity '" << activityName << "':" << std::endl;
+            for (unsigned int j = 0; j < guestsCount; j++) {
+                std::cout << "- " << guests[j]->getFirstName() << " " << guests[j]->getLastName() << std::endl;
+            }
+            break;
+        }
+    }
+
+    if (!activityFound) {
+        std::cout << "Activity '" << activityName << "' not found." << std::endl;
+    }
+}
 bool HotelSystem::isRoomAvailable(const std::string& date) const {
     for (unsigned int i = 0; i < this->roomCount; i++) {
         if (this->rooms[i]->isReservedInPeriod(date, date)) {
@@ -90,25 +120,29 @@ bool HotelSystem::isRoomAvailable(const std::string& date) const {
     return true;
 }
 void HotelSystem::printAvailableRooms(const std::string& checkIn, const std::string& checkOut) const {
+    bool isAvailable = false;
     std::cout << "Available Rooms from " << checkIn << " to " << checkOut << ":" << std::endl;
-    bool availableRoomsExist = false;
-    if (this->roomCount != 0) {
+    if (this->roomCount != 0){
         for (unsigned int i = 0; i < this->roomCount; i++) {
             if (!rooms[i]->isReservedInPeriod(checkIn, checkOut)) {
                 std::cout << "Room Number: " << rooms[i]->getNumber() << std::endl;
                 std::cout << "Number of Beds: " << rooms[i]->getNumberOfBeds() << std::endl;
                 std::cout << "------------------------" << std::endl;
-                availableRoomsExist = true;
             }
         }
+        isAvailable = true;
     }
-    if (!availableRoomsExist) {
+    if (!isAvailable){
         std::cout << "No available rooms for this period of time!" << std::endl;
     }
 }
 void HotelSystem::makeReservation(int roomNumber, const std::string& checkIn, const std::string& checkOut, const std::string& note, unsigned int numGuests) {
     Room* room = getRoom(roomNumber);
     if (room) {
+        if (numGuests == 0) {
+            numGuests = room->getNumberOfBeds();
+        }
+
         Reservation* reservation = new Reservation(roomNumber, checkIn, checkOut, note, numGuests);
         room->addReservation(reservation);
         std::cout << "Reservation made successfully." << std::endl;
@@ -122,6 +156,24 @@ void HotelSystem::cancelReservation(int roomNumber, const std::string& checkIn, 
     if (room) {
         room->cancelReservation(checkIn, checkOut);
         std::cout << "Reservation canceled successfully." << std::endl;
+    } 
+    else {
+        std::cout << "Room not found." << std::endl;
+    }
+}    
+void HotelSystem::addGuestToRoom(int roomNumber, Guest* guest) {
+    Room* room = getRoom(roomNumber);
+    if (room) {
+        room->addGuest(guest);
+        std::cout << "Guest added to Room " << roomNumber << " successfully." << std::endl;
+    } else {
+        std::cout << "Room not found." << std::endl;
+    }
+}
+void HotelSystem::checkout(int roomNumber) {
+    Room* room = getRoom(roomNumber);
+    if (room != nullptr) {
+        room->checkout();
     } 
     else {
         std::cout << "Room not found." << std::endl;
@@ -174,7 +226,8 @@ void HotelSystem::printRoomUsageReport(const std::string& from, const std::strin
     for (unsigned int i = 0; i < roomCount; i++) {
         std::cout << "Room " << rooms[i]->getNumber() << ": ";
         if (rooms[i]->isReservedInPeriod(from, to)) {
-            std::cout << "Occupied" << std::endl;
+            int usageDays = rooms[i]->getUsageDays(from, to);
+            std::cout << "Occupied (" << usageDays << " days)" << std::endl;
         } 
         else {
             std::cout << "Available" << std::endl;
@@ -182,38 +235,67 @@ void HotelSystem::printRoomUsageReport(const std::string& from, const std::strin
     }
 }
 Room* HotelSystem::findAvailableRoom(unsigned int beds, const std::string& from, const std::string& to) const {
-    for (unsigned int i = 0; i < roomCount; i++) {
-        if (rooms[i]->getNumberOfBeds() >= beds && !rooms[i]->isReservedInPeriod(from, to)) {
-            return rooms[i];
-        }
-    }
-    return nullptr;
-}
-void HotelSystem::findEmergencyRoom(unsigned int beds, const std::string& from, const std::string& to, Room*& availableRoom, Room*& roomToSwap1, Room*& roomToSwap2) const {
-    availableRoom = nullptr;
-    roomToSwap1 = nullptr;
-    roomToSwap2 = nullptr;
+    Room* preferredRoom = nullptr;
 
     for (unsigned int i = 0; i < roomCount; i++) {
-        if (rooms[i]->getNumberOfBeds() >= beds && !rooms[i]->isReservedInPeriod(from, to)) {
-            if (availableRoom == nullptr) {
-                availableRoom = rooms[i];
-            } 
-            else if (roomToSwap1 == nullptr) {
-                roomToSwap1 = rooms[i];
-            } 
-            else if (roomToSwap2 == nullptr) {
-                roomToSwap2 = rooms[i];
-                return;
+        Room* currentRoom = rooms[i];
+        if (currentRoom->getNumberOfBeds() >= beds && !currentRoom->isReservedInPeriod(from, to)) {
+            if (preferredRoom == nullptr || currentRoom->getNumberOfBeds() < preferredRoom->getNumberOfBeds()) {
+                preferredRoom = currentRoom;
             }
         }
     }
+
+    return preferredRoom;
+}
+bool HotelSystem::findEmergencyRoom(unsigned int beds, const std::string& from, const std::string& to) {
+    Room* preferredRoom = nullptr;
+
+    Room** occupiedRooms = new Room*[roomCount];
+    unsigned int occupiedRoomCount = 0;
+
+    for (unsigned int i = 0; i < roomCount; i++) {
+        Room* currentRoom = rooms[i];
+        if (currentRoom->isReservedInPeriod(from, to)) {
+            occupiedRooms[occupiedRoomCount] = currentRoom;
+            occupiedRoomCount++;
+        }
+    }
+
+    std::sort(occupiedRooms, occupiedRooms + occupiedRoomCount, [](Room* a, Room* b) {
+        return a->getNumberOfBeds() < b->getNumberOfBeds();
+    });
+
+    for (unsigned int i = 0; i < roomCount; i++) {
+        Room* currentRoom = rooms[i];
+        if (currentRoom->getNumberOfBeds() >= beds && !currentRoom->isReservedInPeriod(from, to)) {
+            if (preferredRoom == nullptr || currentRoom->getNumberOfBeds() < preferredRoom->getNumberOfBeds()) {
+                preferredRoom = currentRoom;
+            }
+        }
+    }
+
+    if (preferredRoom != nullptr) {
+        for (unsigned int i = 0; i < occupiedRoomCount; i++) {
+            Room* occupiedRoom = occupiedRooms[i];
+            if (preferredRoom->getNumberOfBeds() - occupiedRoom->getNumberOfBeds() <= 2) {
+                preferredRoom->moveGuestsFromRoom(occupiedRoom);
+                occupiedRoom->clearReservation();
+            }
+        }
+
+        delete[] occupiedRooms;
+        return true;
+    }
+
+    delete[] occupiedRooms;
+    return false;
 }
 void HotelSystem::declareRoomUnavailable(int roomNumber, const std::string& from, const std::string& to, const std::string& note) {
     Room* room = getRoom(roomNumber);
     if (room != nullptr) {
-        room->addReservation(new Reservation(from, to));
-        std::cout << "Room " << roomNumber << " declared as unavailable." << note << std::endl;
+        room->addReservation(new Reservation(from, to, note));
+        std::cout << "Room " << roomNumber << " declared as unavailable because of " << note << std::endl;
     } 
     else {
         std::cout << "Room not found." << std::endl;
@@ -248,18 +330,8 @@ void HotelSystem::printRoomActivities(int roomNumber) const {
         Activity** roomActivities = room->getActivities();
         unsigned int activityCount = room->getActivitiesCount();
         for (unsigned int i = 0; i < activityCount; i++) {
-            std::cout << roomActivities[i]->getName() << std::endl;
+            std::cout << "- " << roomActivities[i]->getName() << std::endl;
         }
-    } 
-    else {
-        std::cout << "Room not found." << std::endl;
-    }
-}
-void HotelSystem::checkout(int roomNumber) {
-    Room* room = getRoom(roomNumber);
-    if (room != nullptr) {
-        room->clearGuests();
-        std::cout << "Room " << roomNumber << " checked out successfully." << std::endl;
     } 
     else {
         std::cout << "Room not found." << std::endl;
