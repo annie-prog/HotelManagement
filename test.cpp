@@ -1,107 +1,221 @@
 #include "HotelSystem.hpp"
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <iomanip>
 
 int main() {
-    Room* room1 = new Room(101, 2);
-    Room* room2 = new Room(102, 2);
-    Room* room3 = new Room(201, 3);
-
-    Guest* guest1 = new Guest("Aneliya", "Konarcheva", "0882750588");
-    Guest* guest2 = new Guest("Blagovesta", "Hubanova", "0889654321");
-    Guest* guest3 = new Guest("Simona", "Koleva", "0876593846");
-    Guest* guest4 = new Guest("Stefania", "Dimitrova", "0897234567");
-    Guest* guest5 = new Guest("Chocho", "Vladovski", "0897639574");
-    Guest* guest6 = new Guest("Fani", "Manahova", "0876395827");
+    std::string currentFile;
+    bool isOpen = false;
 
     HotelSystem* hotel = HotelSystem::getInstance();
-
-    hotel->addRoom(room1);
-    hotel->addRoom(room2);
-    hotel->addRoom(room3);
-
-    std::cout << "Making reservations..." << std::endl;
-    hotel->makeReservation(101, "2023-05-20", "2023-05-25", "Reservation 1", 0);
-    hotel->makeReservation(102, "2023-05-22", "2023-05-24", "Reservation 2", 2);
-    hotel->makeReservation(201, "2023-05-23", "2023-05-26", "Reservation 3", 3);
-    std::cout << std::endl;
-
-    hotel->addGuestToRoom(101, guest1);
-    hotel->addGuestToRoom(101, guest2);
-    hotel->addGuestToRoom(102, guest6);
-    hotel->addGuestToRoom(102, guest3);
-    hotel->addGuestToRoom(201, guest4);
-    hotel->addGuestToRoom(201, guest5);
-    std::cout << std::endl;
     
-    std::cout << "All Rooms:" << std::endl;
-    hotel->printRooms();
-    std::cout << std::endl;
+    std::cout << "Hotel System - Command Line Interface" << std::endl;
+    std::cout << "Type 'help' for a list of supported commands." << std::endl;
 
-    hotel->declareRoomUnavailable(101, "2023-05-17", "2023-05-19", "Under Construction");
+    while (true) {
+        std::string input;
+        std::cout << "> ";
+        std::getline(std::cin, input);
 
-    std::cout << "Available Rooms:" << std::endl;
-    hotel->printAvailableRooms("2023-05-17", "2023-05-19");
-    std::cout << std::endl;
+        std::istringstream iss(input);
+        std::vector<std::string> tokens;
+        std::string token;
+        while (iss >> std::quoted(token)) {
+            tokens.push_back(token);
+        }
 
-    std::cout << "Room Activities:" << std::endl;
-    hotel->printRoomActivities(101);
-    std::cout << std::endl;
+        if (tokens.empty()) {
+            continue;
+        }
 
-    std::cout << "Adding activity and guest to activity..." << std::endl;
-    hotel->addActivity("Swimming");
-    Guest* guest = new Guest("John", "Doe", "0882750588");
-    hotel->addGuestToActivity("Swimming", guest);
-    std::cout << std::endl;
+        std::string command = tokens[0];
 
-    hotel->addActivity("Jaccuzzi");
-    hotel->addGuestToActivity("Jaccuzzi", guest3);
-    std::cout << std::endl;
+        if (command == "open") {
+            if (isOpen) {
+                std::cout << "A file is already open. Close it before opening another file." << std::endl;
+                continue;
+            }
+            
+            if (tokens.size() < 2) {
+                std::cout << "Please provide a file path to open." << std::endl;
+                continue;
+            }
 
-    std::cout << "Activity Guests:" << std::endl;
-    hotel->printActivityGuests("Swimming");
-    hotel->printActivityGuests("Jaccuzzi");
-    hotel->printActivities();
-    std::cout << std::endl;
+            std::string filePath = tokens[1];
+            std::ifstream file(filePath);
+            if (!file) {
+                std::cout << "File not found. Creating a new file." << std::endl;
+            } 
+            else {
+                std::cout << "Successfully opened " << filePath << std::endl;
+                std::string fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+                file.close();
 
-    std::cout << "Room Activities:" << std::endl;
-    hotel->printRoomActivities(102);
-    std::cout << std::endl;
+                isOpen = true;
+                currentFile = filePath;
+            }
+        } 
+        else if (command == "close") {
+            if (!isOpen) {
+                std::cout << "No file is currently open." << std::endl;
+                continue;
+            }
+            std::cout << "Successfully closed " << currentFile << std::endl;
+            isOpen = false;
+            currentFile = "";
+        } 
+        else if (command == "save") {
+            if (!isOpen) {
+                std::cout << "No file is currently open." << std::endl;
+                continue;
+            }
+            std::cout << "Successfully saved " << currentFile << std::endl;
+        } 
+        else if (command == "saveas") {
+            if (!isOpen) {
+                std::cout << "No file is currently open." << std::endl;
+                continue;
+            }
+            if (tokens.size() < 2) {
+                std::cout << "Please provide a file path to save as." << std::endl;
+                continue;
+            }
+            std::string newFilePath = tokens[1];
+            std::cout << "Successfully saved as " << newFilePath << std::endl;
+        } 
+        else if (command == "help") {
+            std::cout << "The following commands are supported:" << std::endl;
+            std::cout << "open <file>                          opens <file>" << std::endl;
+            std::cout << "close                                closes currently opened file" << std::endl;
+            std::cout << "save                                 saves the currently open file" << std::endl;
+            std::cout << "saveas <file>                        saves the currently open file in <file>" << std::endl;
+            std::cout << "checkin <room number> <start date> <end date>     checks in guests to the room" << std::endl;
+            std::cout << "checkout <room number>               checks out guests from the room" << std::endl;
+            std::cout << "availability                         prints all available rooms for a date" << std::endl;
+            std::cout << "report <from> <to>                   prints room usage report for the specified period" << std::endl;
+            std::cout << "find <beds> <from> <to>              finds an available room" << std::endl;
+            std::cout << "find! <beds> <from> <to>             finds an emergency available room" << std::endl;
+            std::cout << "unavailable <room> <from> <to> <note>      declares a room as unavailable" << std::endl;
+            std::cout << "printRoomActivities <room number>    prints activities for the specified room" << std::endl;
+            std::cout << "printActivityGuests <activity name>  prints guests for the specified activity" << std::endl;
+            std::cout << "help                                 prints this information" << std::endl;
+            std::cout << "exit                                 exits the program" << std::endl;
+        }
+        else if (command == "checkin") {
+            if (tokens.size() < 4) {
+                std::cout << "Invalid command. Please provide room number, check-in date, check-out date, and note." << std::endl;
+                continue;
+            }
+            int roomNumber = std::stoi(tokens[1]);
+            std::string checkIn = tokens[2];
+            std::string checkOut = tokens[3];
+            std::string note;
+            if (tokens.size() > 4) {
+                note = tokens[4];
+            }
 
-    std::cout << "Checking out room..." << std::endl;
-    hotel->checkout(102);
-    std::cout << std::endl;
+            unsigned int numGuests = 0;
+            if (tokens.size() > 5) {
+                numGuests = std::stoi(tokens[5]);
+            }
 
-    std::cout << "Available Rooms:" << std::endl;
-    hotel->printAvailableRooms("2023-05-22", "2023-05-24");
-    std::cout << std::endl;
+            hotel->makeReservation(roomNumber, checkIn, checkOut, note, numGuests);
+        }
+        else if (command == "availability") {
+            std::string date = tokens.size() > 1 ? tokens[1] : "";
+            hotel->printAvailableRooms(date);
+        }
+        else if (command == "checkout") {
+            if (tokens.size() < 2) {
+                std::cout << "Invalid command. Please provide a room number for checkout." << std::endl;
+                continue;
+            }
+            int roomNumber = std::stoi(tokens[1]);
+            hotel->checkout(roomNumber);
+        }
+        else if (command == "report") {
+            if (tokens.size() < 3) {
+                std::cout << "Invalid command. Please provide 'from' and 'to' dates." << std::endl;
+                continue;
+            }
+            std::string from = tokens[1];
+            std::string to = tokens[2];
+            hotel->printRoomUsageReport(from, to);
+        }
+        else if (command == "find") {
+            if (tokens.size() < 4) {
+                std::cout << "Invalid command. Please provide the number of beds, start date, and end date." << std::endl;
+                continue;
+            }
+            unsigned int beds = std::stoi(tokens[1]);
+            std::string from = tokens[2];
+            std::string to = tokens[3];
 
-    std::cout << "Room Activities:" << std::endl;
-    hotel->printRoomActivities(101);
-    std::cout << std::endl;
+            Room* availableRoom = hotel->findAvailableRoom(beds, from, to);
+            if (availableRoom != nullptr) {
+                std::cout << "Found available room: Room " << availableRoom->getNumber() << std::endl;
+            } else {
+                std::cout << "No available room found." << std::endl;
+            }
+        }
+        else if (command == "find!") {
+            if (tokens.size() < 4) {
+                std::cout << "Invalid command. Please provide the number of beds, start date, and end date." << std::endl;
+                continue;
+            }
+            unsigned int beds = std::stoi(tokens[1]);
+            std::string from = tokens[2];
+            std::string to = tokens[3];
 
-    hotel->printRoomUsageReport("2023-05-22", "2023-05-24");
-    std::cout << std::endl;
-
-    Room* availableRoom = hotel->findAvailableRoom(2, "2023-05-19", "2023-05-21");
-    if (availableRoom != nullptr) {
-        std::cout << "Available room found: " << availableRoom->getNumber() << std::endl;
-    } 
-    else {
-        std::cout << "No available room found." << std::endl;
+            bool success = hotel->findEmergencyRoom(beds, from, to);
+            if (success) {
+                std::cout << "Found an available room for emergency: Room " << beds << " beds" << std::endl;
+            } 
+            else {
+                std::cout << "No available room found for emergency." << std::endl;
+            }
+        }
+        else if (command == "unavailable") {
+            if (tokens.size() < 4) {
+                std::cout << "Invalid command. Please provide room number, from date, to date, and note." << std::endl;
+                continue;
+            }
+            int roomNumber = std::stoi(tokens[1]);
+            std::string from = tokens[2];
+            std::string to = tokens[3];
+            std::string note;
+            if (tokens.size() > 4) {
+                note = tokens[4];
+            }
+            hotel->declareRoomUnavailable(roomNumber, from, to, note);
+        }
+        else if (command == "printRoomActivities") {
+            if (tokens.size() < 2) {
+                std::cout << "Invalid command. Please provide a room number." << std::endl;
+                continue;
+            }
+            int roomNumber = std::stoi(tokens[1]);
+            hotel->printRoomActivities(roomNumber);
+        }
+        else if (command == "printActivityGuests") {
+            if (tokens.size() < 2) {
+                std::cout << "Invalid command. Please provide an activity name." << std::endl;
+                continue;
+            }
+            std::string activityName = tokens[1];
+            hotel->printActivityGuests(activityName);
+        }
+        else if (command == "exit") {
+            break;
+        } 
+        else {
+            std::cout << "Invalid command. Type 'help' for a list of supported commands." << std::endl;
+        }
     }
 
-    std::cout << std::boolalpha << hotel->findEmergencyRoom(2, "2023-05-20", "2023-05-24") << std::endl;
-
-    delete guest;
-    delete guest1;
-    delete guest2;
-    delete guest3;
-    delete guest4;
-    delete guest5;
-    delete guest6;
-    delete room1;
-    delete room2;
-    delete room3;
+    std::cout << "Exiting the program..." << std::endl;
 
     return 0;
 }

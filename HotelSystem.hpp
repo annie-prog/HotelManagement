@@ -24,7 +24,8 @@ public:
 
     void printRooms() const;
     bool isRoomAvailable(const std::string& date) const;
-    void printAvailableRooms(const std::string& checkIn, const std::string& checkOut) const;
+    void printAvailableRooms(const std::string& date) const;
+    std::string getCurrentDate() const;
 
     void makeReservation(int roomNumber, const std::string& checkIn, const std::string& checkOut, const std::string& note, unsigned int numGuests);
     void cancelReservation(int roomNumber, const std::string& checkIn, const std::string& checkOut);

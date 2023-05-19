@@ -197,6 +197,15 @@ void Room::checkout() {
 
     std::cout << "Room checked out successfully." << std::endl;
 }
+bool Room::isReservedOnDate(const std::string& currentDate) const {
+    for (unsigned int i = 0; i < reservationsCount; i++) {
+        Reservation* reservation = reservations[i];
+        if (reservation->includesDate(currentDate)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 

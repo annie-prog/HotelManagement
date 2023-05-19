@@ -62,3 +62,6 @@ void Reservation::addGuest(Guest* guest) {
         }
     }
 }
+bool Reservation::includesDate(const std::string& currentDate) const {
+    return (checkInDate <= currentDate) && (currentDate <= checkOutDate);
+}

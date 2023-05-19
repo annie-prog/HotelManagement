@@ -2,6 +2,9 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <chrono>
+#include <ctime>
+#include <sstream>
 
 HotelSystem* HotelSystem::instance = nullptr;
 
@@ -119,21 +122,34 @@ bool HotelSystem::isRoomAvailable(const std::string& date) const {
     }
     return true;
 }
-void HotelSystem::printAvailableRooms(const std::string& checkIn, const std::string& checkOut) const {
+std::string HotelSystem::getCurrentDate() const {
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+
+    std::tm* localTime = std::localtime(&currentTime);
+
+    std::ostringstream oss;
+    oss << std::put_time(localTime, "%Y-%m-%d");
+
+    return oss.str();
+}
+void HotelSystem::printAvailableRooms(const std::string& date) const {
+    std::string currentDate = date.empty() ? getCurrentDate() : date;
+    std::cout << "Available Rooms on " << currentDate << ":" << std::endl;
+
     bool isAvailable = false;
-    std::cout << "Available Rooms from " << checkIn << " to " << checkOut << ":" << std::endl;
-    if (this->roomCount != 0){
-        for (unsigned int i = 0; i < this->roomCount; i++) {
-            if (!rooms[i]->isReservedInPeriod(checkIn, checkOut)) {
-                std::cout << "Room Number: " << rooms[i]->getNumber() << std::endl;
-                std::cout << "Number of Beds: " << rooms[i]->getNumberOfBeds() << std::endl;
-                std::cout << "------------------------" << std::endl;
-            }
+    for (unsigned int i = 0; i < roomCount; i++) {
+        if (!rooms[i]->isReservedOnDate(currentDate)) {
+            std::cout << "Room Number: " << rooms[i]->getNumber() << std::endl;
+            std::cout << "Number of Beds: " << rooms[i]->getNumberOfBeds() << std::endl;
+            std::cout << "------------------------" << std::endl;
+            isAvailable = true;
         }
-        isAvailable = true;
     }
-    if (!isAvailable){
-        std::cout << "No available rooms for this period of time!" << std::endl;
+
+    if (!isAvailable) {
+        std::cout << "No available rooms on " << currentDate << "!" << std::endl;
     }
 }
 void HotelSystem::makeReservation(int roomNumber, const std::string& checkIn, const std::string& checkOut, const std::string& note, unsigned int numGuests) {

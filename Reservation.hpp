@@ -37,4 +37,6 @@ public:
     virtual Guest** getGuests() const override;
     virtual void addGuest(Guest* guest) override;
 
+    bool includesDate(const std::string& currentDate) const;
+
 };
