@@ -85,10 +85,17 @@ void HotelSystem::printRooms() const {
         std::cout << "Room Number: " << this->rooms[i]->getNumber() << std::endl;
         std::cout << "Number of Beds: " << this->rooms[i]->getNumberOfBeds() << std::endl;
         std::cout << "Guests: ";
-        Guest** roomGuests = rooms[i]->getGuests();
-        for (unsigned int j = 0; j < this->rooms[i]->getGuestsCount(); j++) {
-            std::cout << roomGuests[j]->getFirstName() << " " << roomGuests[j]->getLastName() << ", ";
+
+        Guest** roomGuests = this->rooms[i]->getGuests();
+        unsigned int guestCount = 0;
+        while (roomGuests[guestCount] != nullptr) {
+            std::cout << roomGuests[guestCount]->getFirstName() << " " << roomGuests[guestCount]->getLastName();
+            if (roomGuests[guestCount + 1] != nullptr) {
+                std::cout << ", ";
+            }
+            guestCount++;
         }
+        
         std::cout << std::endl;
         std::cout << "------------------------" << std::endl;
     }
@@ -97,10 +104,12 @@ void HotelSystem::printActivityGuests(const std::string& activityName) const {
     bool activityFound = false;
 
     for (unsigned int i = 0; i < activitiesCount; i++) {
-        if (activities[i]->getName() == activityName) {
+        Activity* activity = dynamic_cast<Activity*>(activities[i]); 
+
+        if (activity && activity->getName() == activityName) {
             activityFound = true;
-            Guest** guests = activities[i]->getGuests();
-            unsigned int guestsCount = activities[i]->getGuestsCount();
+            Guest** guests = activity->getGuests();
+            unsigned int guestsCount = activity->getNumGuests();
 
             std::cout << "Guests for activity '" << activityName << "':" << std::endl;
             for (unsigned int j = 0; j < guestsCount; j++) {
@@ -182,7 +191,8 @@ void HotelSystem::addGuestToRoom(int roomNumber, Guest* guest) {
     if (room) {
         room->addGuest(guest);
         std::cout << "Guest added to Room " << roomNumber << " successfully." << std::endl;
-    } else {
+    } 
+    else {
         std::cout << "Room not found." << std::endl;
     }
 }
@@ -209,7 +219,6 @@ void HotelSystem::addActivity(const std::string& name) {
 
     std::cout << "Activity added successfully." << std::endl;
 }
-
 void HotelSystem::addGuestToActivity(const std::string& activityName, Guest* guest) {
     for (unsigned int i = 0; i < this->activitiesCount; i++) {
         if (this->activities[i]->getName() == activityName) {
@@ -226,13 +235,11 @@ void HotelSystem::printActivities() const {
         std::cout << activities[i]->getName() << std::endl;
     }
 }
-
 void HotelSystem::printGuests() const {
     std::cout << "Guests:" << std::endl;
     for (unsigned int i = 0; i < roomCount; i++) {
         Guest** guests = rooms[i]->getGuests();
-        unsigned int guestCount = rooms[i]->getGuestsCount();
-        for (unsigned int j = 0; j < guestCount; j++) {
+        for (unsigned int j = 0; guests[j] != nullptr; j++) {
             std::cout << guests[j]->getFirstName() << " " << guests[j]->getLastName() << std::endl;
         }
     }
@@ -296,7 +303,7 @@ bool HotelSystem::findEmergencyRoom(unsigned int beds, const std::string& from, 
             Room* occupiedRoom = occupiedRooms[i];
             if (preferredRoom->getNumberOfBeds() - occupiedRoom->getNumberOfBeds() <= 2) {
                 preferredRoom->moveGuestsFromRoom(occupiedRoom);
-                occupiedRoom->clearReservation();
+                occupiedRoom->clearReservations();
             }
         }
 
@@ -352,4 +359,13 @@ void HotelSystem::printRoomActivities(int roomNumber) const {
     else {
         std::cout << "Room not found." << std::endl;
     }
+}
+Guest* HotelSystem::findGuestByName(const std::string& guestName) const {
+    for (unsigned int i = 0; i < this->roomCount; i++) {
+        Guest* guest = this->rooms[i]->findGuestByName(guestName);
+        if (guest != nullptr) {
+            return guest;
+        }
+    }
+    return nullptr;
 }
