@@ -11,6 +11,7 @@ public:
 
     std::string getName() const;
     void setName(const std::string& name);
+    bool isValidName(const std::string& name) const;
 };
 
 #ifdef TEST
