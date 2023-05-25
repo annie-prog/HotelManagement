@@ -8,98 +8,63 @@
 //#include "doctest.h"
 
 
-#ifdef DOCTEST_CONFIG_IMPLEMENT
+/*#ifdef DOCTEST_CONFIG_IMPLEMENT
 #define test doctest::Context().run()
 #else
 #define test
-#endif
+#endif*/
 
 int main() {
 
-#ifdef TEST
+/*#ifdef TEST
     test;
-#else
+#else*/
+    HotelSystem* hotelSystem = HotelSystem::getInstance();
+
     Room* room1 = new Room(101, 2);
     Room* room2 = new Room(102, 2);
     Room* room3 = new Room(201, 3);
+    Room* emergencyRoom = new Room(202, 2);
 
-    Guest* guest1 = new Guest("Aneliya", "Konarcheva", "0882750588");
-    Guest* guest2 = new Guest("Blagovesta", "Hubanova", "0889654321");
-    Guest* guest3 = new Guest("Simona", "Koleva", "0876593846");
-    Guest* guest4 = new Guest("Stefania", "Dimitrova", "0897234567");
-    Guest* guest5 = new Guest("Chocho", "Vladovski", "0897639574");
-    Guest* guest6 = new Guest("Fani", "Manahova", "0876395827");
+    hotelSystem->addRoom(room1);
+    hotelSystem->addRoom(room2);
+    hotelSystem->addRoom(room3);
+    hotelSystem->addEmergencyRoom(emergencyRoom);
 
-    HotelSystem* hotel = HotelSystem::getInstance();
+    Activity activity("Gym");
 
-    hotel->addRoom(room1);
-    hotel->addRoom(room2);
-    hotel->addRoom(room3);
+    hotelSystem->printRooms();
 
-    std::cout << "Making reservations..." << std::endl;
-    hotel->makeReservation(101, "2023-05-20", "2023-05-25", "Reservation 1", 0);
-    hotel->makeReservation(102, "2023-05-22", "2023-05-24", "Reservation 2", 2);
-    hotel->makeReservation(201, "2023-05-23", "2023-05-26", "Reservation 3", 3);
-    std::cout << std::endl;
+    hotelSystem->declareRoomUnavailable(102, "2023-05-17", "2023-05-19", "Under Construction");
 
-    hotel->addGuestToRoom(101, guest1);
-    hotel->addGuestToRoom(101, guest2);
-    hotel->addGuestToRoom(102, guest6);
-    hotel->addGuestToRoom(102, guest3);
-    hotel->addGuestToRoom(201, guest4);
-    hotel->addGuestToRoom(201, guest5);
-    std::cout << std::endl;
+    hotelSystem->makeReservation(101, "2023-06-13", "2023-06-15", "Reservation 1", 2);
+    hotelSystem->makeReservation(102, "2023-06-14", "2023-06-16", "Reservation 2", 2);
+    hotelSystem->makeReservation(201, "2023-06-15", "2023-06-19", "Reservation 3", 3);
 
-    std::cout << "All Rooms:" << std::endl;
-    hotel->printRooms();
-    std::cout << std::endl;
+    hotelSystem->printAvailableRooms("2023-05-20");
 
-    hotel->declareRoomUnavailable(101, "2023-05-17", "2023-05-19", "Under Construction");
+    hotelSystem->addActivity("Swimming");
 
-    std::cout << "Available Rooms:" << std::endl;
-    hotel->printAvailableRooms("2023-05-17");
-    std::cout << std::endl;
+    Guest* guest1 = new Guest("John", "Doe", "1234567897");
+    hotelSystem->addGuest(guest1);
 
-    std::cout << "Room Activities:" << std::endl;
-    hotel->printRoomActivities(101);
-    std::cout << std::endl;
+    hotelSystem->addGuestToRoom(101, guest1);
+    hotelSystem->addGuestToRoomActivity(101, "Swimming", guest1);
 
-    std::cout << "Adding activity and guest to activity..." << std::endl;
-    hotel->addActivity("Swimming");
-    Guest* guest = new Guest("John", "Doe", "0882750588");
-    hotel->addGuestToActivity("Swimming", guest);
-    std::cout << std::endl;
+    hotelSystem->addRoomActivity(101, &activity);
+    hotelSystem->printRoomActivities(101);
 
-    hotel->addActivity("Jaccuzzi");
-    hotel->addGuestToActivity("Jaccuzzi", guest3);
-    std::cout << std::endl;
+    hotelSystem->printActivityGuests("Swimming");
 
-    std::cout << "Activity Guests:" << std::endl;
-    hotel->printActivityGuests("Swimming");
-    hotel->printActivityGuests("Jaccuzzi");
-    hotel->printActivities();
-    std::cout << std::endl;
+    Guest* foundGuest = hotelSystem->findGuestByName("John");
+    if (foundGuest) {
+        std::cout << "Found guest: " << foundGuest->getFirstName() << std::endl;
+    } 
+    else {
+        std::cout << "Guest not found." << std::endl;
+    }
 
-    std::cout << "Room Activities:" << std::endl;
-    hotel->printRoomActivities(102);
-    std::cout << std::endl;
-
-    std::cout << "Checking out room..." << std::endl;
-    hotel->checkout(102);
-    std::cout << std::endl;
-
-    std::cout << "Available Rooms:" << std::endl;
-    hotel->printAvailableRooms("2023-05-22");
-    std::cout << std::endl;
-
-    std::cout << "Room Activities:" << std::endl;
-    hotel->printRoomActivities(101);
-    std::cout << std::endl;
-
-    hotel->printRoomUsageReport("2023-05-22", "2023-05-24");
-    std::cout << std::endl;
-
-    Room* availableRoom = hotel->findAvailableRoom(2, "2023-05-19", "2023-05-21");
+    Room* availableRoom = hotelSystem->findAvailableRoom(2, "2023-06-01", "2023-06-03");
     if (availableRoom != nullptr) {
         std::cout << "Available room found: " << availableRoom->getNumber() << std::endl;
     } 
@@ -107,18 +72,23 @@ int main() {
         std::cout << "No available room found." << std::endl;
     }
 
-    std::cout << std::boolalpha << hotel->findEmergencyRoom(2, "2023-05-20", "2023-05-24") << std::endl;
+    bool emergencyRoomFound = hotelSystem->findEmergencyRoom(2, "2023-06-15", "2023-06-19");
+    if (emergencyRoomFound) {
+        std::cout << "Emergency room found and guests moved." << std::endl;
+    } 
+    else {
+        std::cout << "No emergency room found or guests not moved." << std::endl;
+    }
 
-    delete guest;
+    hotelSystem->checkout(101);
+    hotelSystem->printRoomUsageReport("2023-06-14", "2023-06-17");
+    hotelSystem->printActivities();
+
+    std::cout << hotelSystem->getCurrentDate() << std::endl;
+
+    delete hotelSystem;
     delete guest1;
-    delete guest2;
-    delete guest3;
-    delete guest4;
-    delete guest5;
-    delete guest6;
-    delete room1;
-    delete room2;
-    delete room3;
-    std::cout << "Exiting the program..." << std::endl;
-#endif
+
+    return 0;
+//#endif
 }

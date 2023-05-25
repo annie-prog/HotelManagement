@@ -7,10 +7,7 @@
 Room::Room() : number(0), numBeds(0), reservations(nullptr), reservationsCount(0), activities(nullptr), activitiesCount(0) {}
 
 Room::Room(int number, unsigned int numBeds) : number(number), numBeds(numBeds), reservations(nullptr), reservationsCount(0), activities(nullptr), activitiesCount(0) {}
-Room::~Room() {
-    clearGuests();
-    clearReservations();
-}
+Room::~Room() = default;
 int Room::getNumber() const {
     return this->number;
 }
@@ -57,26 +54,10 @@ void Room::addReservation(Reservation* reservation) {
     }
 }
 void Room::cancelReservation(const std::string& checkIn, const std::string& checkOut) {
-    for (unsigned int i = 0; i < reservationsCount; ++i) {
-        if (reservations[i] != nullptr && reservations[i]->getCheckInDate() == checkIn && reservations[i]->getCheckOutDate() == checkOut) {
-            Guest** guests = reservations[i]->getGuests();
-            unsigned int numGuests = reservations[i]->getNumGuests();
-
-            for (unsigned int j = 0; j < numGuests; ++j) {
-                removeGuest(guests[j]);
-            }
-
+    for (int i = reservationsCount - 1; i >= 0; --i) {
+        if (reservations[i]->getCheckInDate() == checkIn && reservations[i]->getCheckOutDate() == checkOut) {
             delete reservations[i];
             reservations[i] = nullptr;
-
-            for (unsigned int k = i; k < reservationsCount - 1; ++k) {
-                reservations[k] = reservations[k + 1];
-            }
-
-            reservations[reservationsCount - 1] = nullptr;
-
-            reservationsCount--;
-
             break;
         }
     }
@@ -124,31 +105,18 @@ void Room::addGuestToActivity(const std::string& activityName, Guest* guest) {
     }
 }
 void Room::clearGuests() {
-    delete[] guests;
-    guests = nullptr;
-    numGuests = 0;
+    if (guests) {
+        delete[] guests;
+        guests = nullptr;
+        numGuests = 0;
+    }
 }
 void Room::clearReservations() {
-    for (unsigned int i = 0; i < reservationsCount; ++i) {
-        Reservation* reservation = reservations[i];
-        if (reservation != nullptr) {
-            Guest** guests = reservation->getGuests();
-            unsigned int numGuests = reservation->getNumGuests();
-
-            for (unsigned int j = 0; j < numGuests; ++j) {
-                removeGuest(guests[j]);
-                delete guests[j];
-            }
-
-            delete[] guests;
-            delete reservation;
-            reservations[i] = nullptr;
-        }
+    if (reservations) {
+        delete[] reservations;
+        reservations = nullptr;
+        reservationsCount = 0;
     }
-
-    delete[] reservations;
-    reservations = nullptr;
-    reservationsCount = 0;
 }
 void Room::checkout() {
     clearGuests();
@@ -158,18 +126,26 @@ void Room::printRoomUsageReport(const std::string& from, const std::string& to) 
     std::cout << "Room " << number << " usage report:" << std::endl;
     std::cout << "-------------------------------------" << std::endl;
 
-    for (unsigned int i = 0; i < reservationsCount; i++) {
-        Reservation* reservation = reservations[i];
-        const std::string& startDate = reservation->getCheckInDate();
-        const std::string& endDate = reservation->getCheckOutDate();
+    int usageDays = getUsageDays(from, to);
 
-        if (startDate <= to && endDate >= from) {
-            std::string reservationFrom = (startDate >= from) ? startDate : from;
-            std::string reservationTo = (endDate <= to) ? endDate : to;
+    std::cout << "Usage days: " << usageDays << std::endl;
 
-            std::cout << "Reservation: " << reservationFrom << " - " << reservationTo << std::endl;
+    if (usageDays > 0) {
+        std::cout << "Reservations within the specified period:" << std::endl;
+        for (unsigned int i = 0; i < reservationsCount; i++) {
+            Reservation* reservation = reservations[i];
+            const std::string& startDate = reservation->getCheckInDate();
+            const std::string& endDate = reservation->getCheckOutDate();
+
+            if (startDate <= to && endDate >= from) {
+                std::string reservationFrom = (startDate >= from) ? startDate : from;
+                std::string reservationTo = (endDate <= to) ? endDate : to;
+
+                std::cout << "Reservation: " << reservationFrom << " - " << reservationTo << std::endl;
+            }
         }
     }
+
     std::cout << "-------------------------------------" << std::endl;
 }
 int Room::getUsageDays(const std::string& from, const std::string& to) const {
@@ -249,23 +225,12 @@ Guest* Room::findGuestByName(const std::string& guestFirstName) const {
 }
 void Room::printActivities() const {
     std::cout << "Activities for Room " << number << ":" << std::endl;
-    for (unsigned int i = 0; i < activitiesCount; ++i) {
-        std::cout << "- " << activities[i]->getName() << std::endl;
-    }
-}
-void Room::removeGuest(Guest* guest) {
-    if (guests == nullptr || numGuests == 0)
-        return;
-
-    for (unsigned int i = 0; i < numGuests; i++) {
-        if (guests[i] == guest) {
-            delete guests[i];
-            for (unsigned int j = i; j < numGuests - 1; j++) {
-                guests[j] = guests[j + 1];
-            }
-            guests[numGuests - 1] = nullptr;
-            numGuests--;
-            return;
+    if (activitiesCount == 0) {
+        std::cout << "No activities found." << std::endl;
+    } 
+    else {
+        for (unsigned int i = 0; i < activitiesCount; ++i) {
+            std::cout << "- " << activities[i]->getName() << std::endl;
         }
     }
 }

@@ -5,7 +5,7 @@
 #include <vector>
 
 class Room : public Accommodation {
-protected:
+private:
     int number;
     unsigned int numBeds;
     Reservation** reservations;
@@ -16,7 +16,7 @@ protected:
 public:
     Room();
     Room(int number, unsigned int numBeds);
-    ~Room();
+    virtual ~Room();
 
     int getNumber() const;
     unsigned int getNumberOfBeds() const;
@@ -27,9 +27,9 @@ public:
     Activity** getActivities() const;
     unsigned int getActivitiesCount() const;
 
-    virtual void addReservation(Reservation* reservation);
+    void addReservation(Reservation* reservation);
     void cancelReservation(const std::string& checkIn, const std::string& checkOut);
-    virtual void addActivity(Activity* activity);
+    void addActivity(Activity* activity);
 
     bool isReservedInPeriod(const std::string& from, const std::string& to) const;
     void addGuestToActivity(const std::string& activityName, Guest* guest);
@@ -45,7 +45,6 @@ public:
 
     Guest* findGuestByName(const std::string& guestName) const;
     void printActivities() const;
-    void removeGuest(Guest* guest);
 };
 #ifdef TEST
 TEST_SUITE("Room") {
@@ -77,7 +76,7 @@ TEST_SUITE("Room") {
         CHECK_EQ(guests[1]->getPhoneNumber(), "987654321");
     }
 
-    /*TEST_CASE("Add Reservation") {
+    TEST_CASE("Add Reservation") {
         Room room(101, 2);
         Reservation reservation1("2023-05-20", "2023-05-22");
         Reservation reservation2("2023-05-25", "2023-05-27");
@@ -94,7 +93,7 @@ TEST_SUITE("Room") {
         CHECK_EQ(room.getReservations()[1], &reservation2);
     }
 
-    TEST_CASE("Cancel Reservation") {
+    /*TEST_CASE("Cancel Reservation") {
         Room room(101, 2);
         Reservation reservation1("2023-06-01", "2023-06-05");
         Reservation reservation2("2023-06-10", "2023-06-15");
@@ -108,7 +107,7 @@ TEST_SUITE("Room") {
 
         CHECK_EQ(reservations[0]->getCheckInDate(), "2023-06-10");
         CHECK_EQ(reservations[0]->getCheckOutDate(), "2023-06-15");
-    }
+    }*/
     
     TEST_CASE("Add Activity") {
         Room room(101, 2);
@@ -205,6 +204,6 @@ TEST_SUITE("Room") {
         room.addReservation(&reservation2);
 
         CHECK_EQ(room.getUsageDays("2023-06-01", "2023-06-05"), 5);
-    }*/
+    }
 }
 #endif

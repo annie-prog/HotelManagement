@@ -10,13 +10,11 @@ private:
     std::string checkInDate;
     std::string checkOutDate;
     std::string note;   
-
-    void deallocate();
 public:
     Reservation(const std::string& checkInDate, const std::string& checkOutDate);
     Reservation(const std::string& checkInDate, const std::string& checkOutDate, const std::string& note);
-    Reservation(int roomNumber, const std::string& checkInDate, const std::string& checkOutDate, const std::string& note, unsigned int numGuests);
-    ~Reservation();
+    Reservation(int roomNumber, const std::string& checkInDate, const std::string& checkOutDate, const std::string& note);
+    virtual ~Reservation();
 
     int getRoomNumber() const;
     void setRoomNumber(int roomNumber);
@@ -29,11 +27,6 @@ public:
 
     std::string getNote() const;
     void checkNote(const std::string& note);
-
-    virtual unsigned int getNumGuests() const override;    
-    void setNumberOfGuests(unsigned int numGuests);
-    virtual Guest** getGuests() const override;
-    virtual void addGuest(Guest* guest) override;
 
     bool includesDate(const std::string& currentDate) const;
     int getUsageDays(const std::string& from, const std::string& to) const;
@@ -60,9 +53,6 @@ TEST_SUITE("Reservation") {
 
         reservation.checkNote("Important note");
         CHECK_EQ(reservation.getNote(), "Important note");
-
-        reservation.setNumberOfGuests(2);
-        CHECK_EQ(reservation.getNumGuests(), 2);
     }
 
     TEST_CASE("Add and Get Guests") {
