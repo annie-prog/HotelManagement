@@ -45,7 +45,7 @@ int main() {
 
     hotelSystem->addActivity("Swimming");
 
-    Guest* guest1 = new Guest("John", "Doe", "1234567897");
+    Guest* guest1 = new Guest("John", "Doe", "12345-67897");
     hotelSystem->addGuest(guest1);
 
     hotelSystem->addGuestToRoom(101, guest1);

@@ -1,11 +1,15 @@
 #pragma once
 #include <string>
+#include <stdexcept>
 
 class Guest {
 private:
     std::string firstName;
     std::string lastName;
     std::string phoneNumber;
+private:
+    bool isValidName(const std::string& name) const;
+    bool isValidPhoneNumber(const std::string& phoneNumber) const;
 public:
     Guest(const std::string& firstName, const std::string& lastName, const std::string& phoneNumber);
     ~Guest();
