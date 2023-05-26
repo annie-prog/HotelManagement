@@ -11,6 +11,9 @@ Guest::Guest(const std::string& firstName, const std::string& lastName, const st
     if(phoneNumber.size() > 13){
         throw std::invalid_argument("Phone number is longer than it should.");
     }
+    if(phoneNumber.size() < 10){
+        throw std::invalid_argument("Phone number is shorter than it should.");
+    }
     if((firstName.size() > 20) || lastName.size() > 20){
         throw std::invalid_argument("Name is longer than it should.");
     }

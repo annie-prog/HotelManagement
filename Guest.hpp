@@ -26,11 +26,45 @@ public:
 
 TEST_SUITE("Guest") {
     TEST_CASE("Get Guest Information") {
-        Guest guest("John", "Doe", "123456789");
+        Guest guest("John", "Doe", "12345678932");
 
         REQUIRE_EQ(guest.getFirstName(), "John");
         REQUIRE_EQ(guest.getLastName(), "Doe");
-        REQUIRE_EQ(guest.getPhoneNumber(), "123456789");
+        REQUIRE_EQ(guest.getPhoneNumber(), "12345678932");
+    }
+
+    TEST_CASE("Invalid First Name") {
+        SUBCASE("Empty First Name") {
+            CHECK_THROWS_AS(Guest("", "Doe", "123456789"), std::invalid_argument);
+        }
+
+        SUBCASE("Whitespace First Name") {
+            CHECK_THROWS_AS(Guest("   ", "Doe", "123456789"), std::invalid_argument);
+        }
+    }
+
+    TEST_CASE("Invalid Last Name") {
+        SUBCASE("Empty Last Name") {
+            CHECK_THROWS_AS(Guest("John", "", "123456789"), std::invalid_argument);
+        }
+
+        SUBCASE("Whitespace Last Name") {
+            CHECK_THROWS_AS(Guest("John", "   ", "123456789"), std::invalid_argument);
+        }
+    }
+
+    TEST_CASE("Invalid Phone Number") {
+        SUBCASE("Empty Phone Number") {
+            CHECK_THROWS_AS(Guest("John", "Doe", ""), std::invalid_argument);
+        }
+
+        SUBCASE("Whitespace Phone Number") {
+            CHECK_THROWS_AS(Guest("John", "Doe", "   "), std::invalid_argument);
+        }
+
+        SUBCASE("Invalid Format") {
+            CHECK_THROWS_AS(Guest("John", "Doe", "1234"), std::invalid_argument);
+        }
     }
 }
 

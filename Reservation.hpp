@@ -4,17 +4,18 @@
 #include <string>
 #include <ctime>
 
-class Reservation : public Accommodation {
+class Reservation{
 private:
     int roomNumber;
     std::string checkInDate;
     std::string checkOutDate;
-    std::string note;   
+    std::string note;  
+    Accommodation accommodation; 
 public:
     Reservation(const std::string& checkInDate, const std::string& checkOutDate);
     Reservation(const std::string& checkInDate, const std::string& checkOutDate, const std::string& note);
     Reservation(int roomNumber, const std::string& checkInDate, const std::string& checkOutDate, const std::string& note);
-    virtual ~Reservation();
+    ~Reservation();
 
     int getRoomNumber() const;
     void setRoomNumber(int roomNumber);
@@ -28,8 +29,15 @@ public:
     std::string getNote() const;
     void checkNote(const std::string& note);
 
+    Guest** getGuests() const;
+    int getNumGuests() const;
+
     bool includesDate(const std::string& currentDate) const;
-    int getUsageDays(const std::string& from, const std::string& to) const;
+
+    bool isValidDate(const std::string& date);
+    bool isValidRoomNumber(int roomNumber) const;
+
+    Accommodation& getAccommodation();
 };
 
 #ifdef TEST
@@ -38,49 +46,78 @@ public:
 #include "Guest.hpp"
 
 TEST_SUITE("Reservation") {
-    TEST_CASE("Getters and Setters") {
-        Reservation reservation("2023-05-20", "2023-05-22");
-        CHECK_EQ(reservation.getCheckInDate(), "2023-05-20");
-        CHECK_EQ(reservation.getCheckOutDate(), "2023-05-22");
+    TEST_CASE("Get Room Number") {
+        Reservation reservation("2023-05-20", "2023-05-22", "Sample Note");
+        CHECK_EQ(reservation.getRoomNumber(), 0);
 
-        reservation.setCheckInDate("2023-05-25");
-        reservation.setCheckOutDate("2023-05-27");
-        CHECK_EQ(reservation.getCheckInDate(), "2023-05-25");
-        CHECK_EQ(reservation.getCheckOutDate(), "2023-05-27");
-
-        reservation.setRoomNumber(101);
-        CHECK_EQ(reservation.getRoomNumber(), 101);
-
-        reservation.checkNote("Important note");
-        CHECK_EQ(reservation.getNote(), "Important note");
+        reservation.setRoomNumber(42);
+        CHECK_EQ(reservation.getRoomNumber(), 42);
     }
 
-    TEST_CASE("Add and Get Guests") {
-        Reservation reservation("2023-05-20", "2023-05-22");
-        Guest guest1("John", "Doe", "123456789");
-        Guest guest2("Jane", "Smith", "987654321");
+    TEST_CASE("Get Check-In Date") {
+        Reservation reservation("2023-05-20", "2023-05-22", "Sample Note");
+        CHECK_EQ(reservation.getCheckInDate(), "2023-05-20");
 
-        reservation.addGuest(&guest1);
-        reservation.addGuest(&guest2);
+        reservation.setCheckInDate("2023-05-21");
+        CHECK_EQ(reservation.getCheckInDate(), "2023-05-21");
+    }
 
-        Guest** guests = reservation.getGuests();
+    TEST_CASE("Get Check-Out Date") {
+        Reservation reservation("2023-05-20", "2023-05-22", "Sample Note");
+        CHECK_EQ(reservation.getCheckOutDate(), "2023-05-22");
 
-        CHECK_EQ(reservation.getNumGuests(), 2);
-        CHECK_EQ(guests[0]->getFirstName(), "John");
-        CHECK_EQ(guests[0]->getLastName(), "Doe");
-        CHECK_EQ(guests[0]->getPhoneNumber(), "123456789");
-        CHECK_EQ(guests[1]->getFirstName(), "Jane");
-        CHECK_EQ(guests[1]->getLastName(), "Smith");
-        CHECK_EQ(guests[1]->getPhoneNumber(), "987654321");
+        reservation.setCheckOutDate("2023-05-23");
+        CHECK_EQ(reservation.getCheckOutDate(), "2023-05-23");
+    }
+
+    TEST_CASE("Get Note") {
+        Reservation reservation("2023-05-20", "2023-05-22", "Sample Note");
+        CHECK_EQ(reservation.getNote(), "Sample Note");
+
+        reservation.checkNote("Updated Note");
+        CHECK_EQ(reservation.getNote(), "Updated Note");
+    }
+
+    TEST_CASE("Get Accommodation") {
+        Reservation reservation("2023-05-20", "2023-05-22", "Sample Note");
+        Accommodation& accommodation = reservation.getAccommodation();
+
+        CHECK_EQ(&accommodation, &reservation.getAccommodation());
     }
 
     TEST_CASE("Includes Date") {
-        Reservation reservation("2023-05-20", "2023-05-22");
+        Reservation reservation("2023-05-20", "2023-05-22", "Sample Note");
         CHECK(reservation.includesDate("2023-05-20"));
         CHECK(reservation.includesDate("2023-05-21"));
         CHECK(reservation.includesDate("2023-05-22"));
         CHECK_FALSE(reservation.includesDate("2023-05-19"));
         CHECK_FALSE(reservation.includesDate("2023-05-23"));
+    }
+
+    TEST_CASE("isValidDate") {
+        Reservation reservation("2023-05-20", "2023-05-22", "Sample Note");
+
+        CHECK(reservation.isValidDate("2023-05-20"));
+        CHECK(reservation.isValidDate("2023-12-31"));
+        CHECK(reservation.isValidDate("2023-01-01"));
+
+        CHECK_FALSE(reservation.isValidDate("2023/05/20"));
+        CHECK_FALSE(reservation.isValidDate("2023-5-20"));
+        CHECK_FALSE(reservation.isValidDate("05-20-2023"));
+        CHECK_FALSE(reservation.isValidDate("2023-05-32"));
+    }
+
+    TEST_CASE("isValidRoomNumber") {
+        Reservation reservation("2023-05-20", "2023-05-22", "Sample Note");
+
+        CHECK(reservation.isValidRoomNumber(-1000));
+        CHECK(reservation.isValidRoomNumber(0));
+        CHECK(reservation.isValidRoomNumber(1000));
+
+        CHECK_FALSE(reservation.isValidRoomNumber(-1001));
+        CHECK_FALSE(reservation.isValidRoomNumber(1001));
+        CHECK_FALSE(reservation.isValidRoomNumber(2000));
+        CHECK_FALSE(reservation.isValidRoomNumber(-2000));
     }
 }
 #endif

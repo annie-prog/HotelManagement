@@ -5,8 +5,6 @@
 #include <sstream>
 #include <vector>
 #include <iomanip>
-//#include "doctest.h"
-
 
 /*#ifdef DOCTEST_CONFIG_IMPLEMENT
 #define test doctest::Context().run()
@@ -41,20 +39,20 @@ int main() {
     hotelSystem->makeReservation(102, "2023-06-14", "2023-06-16", "Reservation 2", 2);
     hotelSystem->makeReservation(201, "2023-06-15", "2023-06-19", "Reservation 3", 3);
 
-    hotelSystem->printAvailableRooms("2023-05-20");
+    hotelSystem->printAvailableRooms("2023-05-18");
 
-    hotelSystem->addActivity("Swimming");
+    hotelSystem->addActivity("Gym");
 
     Guest* guest1 = new Guest("John", "Doe", "12345-67897");
     hotelSystem->addGuest(guest1);
 
     hotelSystem->addGuestToRoom(101, guest1);
-    hotelSystem->addGuestToRoomActivity(101, "Swimming", guest1);
+    hotelSystem->addGuestToRoomActivity(101, "Gym", guest1);
 
     hotelSystem->addRoomActivity(101, &activity);
     hotelSystem->printRoomActivities(101);
 
-    hotelSystem->printActivityGuests("Swimming");
+    hotelSystem->printActivityGuests("Gym");
 
     Guest* foundGuest = hotelSystem->findGuestByName("John");
     if (foundGuest) {

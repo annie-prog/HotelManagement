@@ -1,7 +1,7 @@
 #include "Activity.hpp"
 #include <iostream>
 
-Activity::Activity(const std::string& name) : name(name){
+Activity::Activity(const std::string& name) : name(name), accommodation(){
     if (!isValidName(name)) {
         throw std::invalid_argument("Invalid name. Name must consist of letters only.");
     }
@@ -19,6 +19,12 @@ std::string Activity::getName() const {
 void Activity::setName(const std::string& name) {
     this->name = name;
 }
+Accommodation& Activity::getAccommodation() {
+    return this->accommodation;
+}
+void Activity::setAccommodation(const Accommodation& accommodation) {
+    this->accommodation = accommodation;
+}
 bool Activity::isValidName(const std::string& name) const {
     for (char c : name) {
         if (!std::isalpha(c)) {
@@ -26,4 +32,7 @@ bool Activity::isValidName(const std::string& name) const {
         }
     }
     return true;
+}
+void Activity::addGuest(const Guest& guest) {
+    accommodation.addGuest(guest);
 }

@@ -4,10 +4,13 @@
 #include <sstream>
 #include <iomanip>
 
-Room::Room() : number(0), numBeds(0), reservations(nullptr), reservationsCount(0), activities(nullptr), activitiesCount(0) {}
+Room::Room() : number(0), numBeds(0), reservations(new Reservation*[100]), reservationsCount(0), activities(new Activity*[100]), activitiesCount(0), accommodations(new Accommodation*[100]), accommodationsCount(0), guests(new Guest*[100]), guestsCount(0) {}
 
-Room::Room(int number, unsigned int numBeds) : number(number), numBeds(numBeds), reservations(nullptr), reservationsCount(0), activities(nullptr), activitiesCount(0) {}
-Room::~Room() = default;
+Room::Room(int number, unsigned int numBeds) : number(number), numBeds(numBeds), reservations(new Reservation*[100]), reservationsCount(0), activities(new Activity*[100]), activitiesCount(0), accommodations(new Accommodation*[100]), accommodationsCount(0), guests(new Guest*[100]), guestsCount(0) {}
+Room::~Room() {
+    clearReservations();
+    clearGuests();
+}
 int Room::getNumber() const {
     return this->number;
 }
@@ -20,107 +23,90 @@ Reservation** Room::getReservations() const {
 unsigned int Room::getReservationsCount() const{
     return this->reservationsCount;
 }
+Guest** Room::getGuests() const {
+    return this->guests;
+}
+unsigned int Room::getGuestsCount() const{
+    return this->guestsCount;
+}
 Activity** Room::getActivities() const {
     return this->activities;
 }
 unsigned int Room::getActivitiesCount() const{
     return this->activitiesCount;
 }
-void Room::addReservation(Reservation* reservation) {
-    if (reservation == nullptr) {
-        return;
-    }
-    for (unsigned int i = 0; i < reservationsCount; i++) {
-        if (reservations[i] == reservation) {
-            return;
-        }
-    }
-    Reservation** newReservations = new Reservation*[reservationsCount + 1];
-
-    for (unsigned int i = 0; i < reservationsCount; ++i) {
-        newReservations[i] = reservations[i];
-    }
-    newReservations[reservationsCount] = reservation;
-
-    delete[] reservations;
-
-    reservations = newReservations;
-    ++reservationsCount;
-
-    Guest** guests = reservation->getGuests();
-    unsigned int numGuests = reservation->getNumGuests();
-    for (unsigned int i = 0; i < numGuests; ++i) {
-        addGuest(guests[i]);
+Accommodation** Room::getAccommodations() const {
+    return this->accommodations;
+}
+unsigned int Room::getAccommodationsCount() const {
+    return this->accommodationsCount;
+}
+void Room::addReservation(const Reservation& reservation) {
+    if (reservationsCount < 100) {
+        reservations[reservationsCount] = new Reservation(reservation);
+        reservationsCount++;
+    } 
+    else {
+        std::cout << "Cannot add reservation. Maximum number of reservations reached." << std::endl;
     }
 }
-void Room::cancelReservation(const std::string& checkIn, const std::string& checkOut) {
-    for (int i = reservationsCount - 1; i >= 0; --i) {
-        if (reservations[i]->getCheckInDate() == checkIn && reservations[i]->getCheckOutDate() == checkOut) {
-            delete reservations[i];
-            reservations[i] = nullptr;
-            break;
-        }
+void Room::addActivity(const Activity& activity) {
+    if (activitiesCount < 100) {
+        activities[activitiesCount] = new Activity(activity);
+        activitiesCount++;
+    } 
+    else {
+        std::cout << "Cannot add activity. Maximum number of activities reached." << std::endl;
     }
 }
-void Room::addActivity(Activity* activity) {
-    if (activity == nullptr) {
-        return;
+void Room::addGuest(const Guest& guest) {
+    if (guestsCount < this->numBeds) {
+        guests[guestsCount] = new Guest(guest);
+        guestsCount++;
+    } 
+    else {
+        std::cout << "Cannot add guest. Maximum number of guests in a room reached." << std::endl;
     }
-    for (unsigned int i = 0; i < activitiesCount; i++) {
-        if (activities[i] == activity) {
-            return;
-        }
-    }
-    Activity** newActivities = new Activity*[activitiesCount + 1];
-
-    for (unsigned int i = 0; i < activitiesCount; ++i) {
-        newActivities[i] = activities[i];
-    }
-
-    newActivities[activitiesCount] = activity;
-
-    delete[] activities;
-
-    activities = newActivities;
-    ++activitiesCount;
 }
 bool Room::isReservedInPeriod(const std::string& from, const std::string& to) const {
     for (unsigned int i = 0; i < reservationsCount; i++) {
-        if (reservations[i]->includesDate(from) || reservations[i]->includesDate(to)) {
+        Reservation* reservation = reservations[i];
+        if (reservation->includesDate(from) || reservation->includesDate(to)) {
             return true;
         }
     }
     return false;
 }
 void Room::addGuestToActivity(const std::string& activityName, Guest* guest) {
-    if (guest == nullptr) {
-        return;
-    }
-
-    for (unsigned int i = 0; i < activitiesCount; ++i) {
-        if (activities[i]->getName() == activityName) {
-            activities[i]->addGuest(guest);
+    for (unsigned int i = 0; i < this->activitiesCount; i++) {
+        Activity* activity = activities[i];
+        if (activity->getName() == activityName) {
+            activity->addGuest(*guest);
+            std::cout << "Guest " << guest->getFirstName() << " " << guest->getLastName()
+                      << " added to activity " << activityName << " in room " << number << "." << std::endl;
             return;
         }
     }
+    std::cout << "Activity not found." << std::endl;
 }
 void Room::clearGuests() {
-    if (guests) {
-        delete[] guests;
-        guests = nullptr;
-        numGuests = 0;
+    for (unsigned int i = 0; i < activitiesCount; i++) {
+        Activity* activity = activities[i];
+        Accommodation& accommodation = activity->getAccommodation();
+        accommodation.clearGuests();
     }
+    guestsCount = 0;
 }
 void Room::clearReservations() {
-    if (reservations) {
-        delete[] reservations;
-        reservations = nullptr;
-        reservationsCount = 0;
+    for (unsigned int i = 0; i < reservationsCount; i++) {
+        delete reservations[i];
     }
+    reservationsCount = 0;
 }
 void Room::checkout() {
     clearGuests();
     clearReservations();
+    std::cout << "Room checked out successfully." << std::endl;
 }
 void Room::printRoomUsageReport(const std::string& from, const std::string& to) const {
     std::cout << "Room " << number << " usage report:" << std::endl;
@@ -195,17 +181,26 @@ int Room::getUsageDays(const std::string& from, const std::string& to) const {
     return usageDays + 1;
 }
 void Room::moveGuestsFromRoom(Room* sourceRoom) {
-    if (sourceRoom == nullptr) {
+    if (sourceRoom->getActivitiesCount() == 0) {
+        std::cout << "Source room has no activities." << std::endl;
         return;
     }
-    unsigned int sourceGuestsCount = sourceRoom->getNumGuests();
-    Guest** sourceGuests = sourceRoom->getGuests();
 
-    for (unsigned int i = 0; i < sourceGuestsCount; ++i) {
-        addGuest(sourceGuests[i]);
+    Activity** sourceActivities = sourceRoom->getActivities();
+    unsigned int sourceActivitiesCount = sourceRoom->getActivitiesCount();
+
+    for (unsigned int i = 0; i < sourceActivitiesCount; i++) {
+        Activity* activity = sourceActivities[i];
+        Guest** guests = activity->getAccommodation().getGuests();
+        unsigned int numGuests = activity->getAccommodation().getNumGuests();
+
+        for (unsigned int j = 0; j < numGuests; j++) {
+            addGuestToActivity(activity->getName(), guests[j]);
+        }
     }
 
     sourceRoom->clearGuests();
+    std::cout << "Guests moved successfully." << std::endl;
 }
 bool Room::isReservedOnDate(const std::string& currentDate) const {
     for (unsigned int i = 0; i < reservationsCount; i++) {
@@ -215,10 +210,11 @@ bool Room::isReservedOnDate(const std::string& currentDate) const {
     }
     return false;
 }
-Guest* Room::findGuestByName(const std::string& guestFirstName) const {
-    for (unsigned int i = 0; i < numGuests; ++i) {
-        if (guests[i]->getFirstName() == guestFirstName) {
-            return guests[i];
+Guest* Room::findGuestByName(const std::string& guestName) const {
+    for (unsigned int i = 0; i < guestsCount; i++) {
+        Guest* guest = guests[i];
+        if (guest->getFirstName() == guestName) {
+            return guest;
         }
     }
     return nullptr;

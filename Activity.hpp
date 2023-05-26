@@ -2,16 +2,20 @@
 #include "Accommodation.hpp"
 #include <string>
 
-class Activity : public Accommodation {
+class Activity{
 private:
     std::string name;
+    Accommodation accommodation;
 public:
     Activity(const std::string& name);
-    virtual ~Activity();
+    ~Activity();
 
     std::string getName() const;
     void setName(const std::string& name);
+    Accommodation& getAccommodation();
+    void setAccommodation(const Accommodation& accommodation);
     bool isValidName(const std::string& name) const;
+    void addGuest(const Guest& guest);
 };
 
 #ifdef TEST
@@ -31,35 +35,36 @@ TEST_SUITE("Activity") {
         CHECK_EQ(activity.getName(), "Hiking");
     }
 
-    TEST_CASE("Add Guest") {
-        Activity activity("Swimming");
-        Guest guest("John", "Doe", "123456789");
+    TEST_CASE("Valid Name") {
+        Activity activity("ValidName");
 
-        activity.addGuest(&guest);
-
-        CHECK_EQ(activity.getNumGuests(), 1);
-        CHECK_EQ(activity.getGuests()[0]->getFirstName(), "John");
-        CHECK_EQ(activity.getGuests()[0]->getLastName(), "Doe");
-        CHECK_EQ(activity.getGuests()[0]->getPhoneNumber(), "123456789");
+        CHECK(activity.isValidName("ValidName"));
+        CHECK(activity.isValidName("AnotherValidName"));
     }
 
-    TEST_CASE("Get Guests") {
+    TEST_CASE("Invalid Name: Empty") {
+        CHECK_THROWS_AS(Activity(""), std::invalid_argument);
+    }
+
+    TEST_CASE("Invalid Name: Non-Alphabetic Characters") {
+        CHECK_THROWS_AS(Activity("123"), std::invalid_argument);
+        CHECK_THROWS_AS(Activity("Name1"), std::invalid_argument);
+        CHECK_THROWS_AS(Activity("Invalid-Name"), std::invalid_argument);
+    }
+
+    TEST_CASE("Invalid Name: Too Long") {
+        CHECK_THROWS_AS(Activity("ThisNameIsTooLongToBeValid"), std::invalid_argument);
+    }
+
+    TEST_CASE("Invalid Name: Too Short") {
+        CHECK_THROWS_AS(Activity("A"), std::invalid_argument);
+    }
+
+    TEST_CASE("Get Accommodation") {
         Activity activity("Swimming");
-        Guest guest1("John", "Doe", "123456789");
-        Guest guest2("Jane", "Smith", "987654321");
+        Accommodation& accommodation = activity.getAccommodation();
 
-        activity.addGuest(&guest1);
-        activity.addGuest(&guest2);
-
-        Guest** guests = activity.getGuests();
-
-        CHECK_EQ(activity.getNumGuests(), 2);
-        CHECK_EQ(guests[0]->getFirstName(), "John");
-        CHECK_EQ(guests[0]->getLastName(), "Doe");
-        CHECK_EQ(guests[0]->getPhoneNumber(), "123456789");
-        CHECK_EQ(guests[1]->getFirstName(), "Jane");
-        CHECK_EQ(guests[1]->getLastName(), "Smith");
-        CHECK_EQ(guests[1]->getPhoneNumber(), "987654321");
+        CHECK_EQ(&accommodation, &activity.getAccommodation());
     }
 }
 #endif

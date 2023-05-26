@@ -6,27 +6,34 @@ Accommodation::Accommodation() : guests(nullptr), numGuests(0) {}
 Accommodation::~Accommodation() {
     delete[] this->guests;
 }
-void Accommodation::addGuest(Guest* guest) {
-    if (guest == nullptr) {
-        throw std::invalid_argument("Invalid guest provided.");
+void Accommodation::addGuest(const Guest& guest) {
+    Guest** newGuests = new Guest*[numGuests + 1];
+
+    for (unsigned int i = 0; i < numGuests; i++) {
+        newGuests[i] = guests[i];
     }
-    try {
-        Guest** temp = new Guest*[this->numGuests + 1];
-        for (int i = 0; i < numGuests; ++i) {
-            temp[i] = this->guests[i];
-        }
-        temp[this->numGuests] = guest;
-        delete[] this->guests;
-        this->guests = temp;
-        this->numGuests++;
-    } 
-    catch (std::bad_alloc& e) {
-        throw std::runtime_error("Failed to allocate memory for guests.");
-    }
+    newGuests[numGuests] = new Guest(guest);
+
+    delete[] guests;
+    guests = newGuests;
+    numGuests++;
 }
 Guest** Accommodation::getGuests() const {
     return this->guests;
 }
 unsigned int Accommodation::getNumGuests() const {
     return this->numGuests;
+}
+void Accommodation::setGuests(Guest** guests) {
+    this->guests = guests;
+}
+void Accommodation::setNumGuests(unsigned int numGuests) {
+    this->numGuests = numGuests;
+}
+void Accommodation::clearGuests() {
+    if (guests) {
+        delete[] guests;
+        guests = nullptr;
+        numGuests = 0;
+    }
 }
