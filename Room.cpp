@@ -6,7 +6,14 @@
 
 Room::Room() : number(0), numBeds(0), reservations(new Reservation*[100]), reservationsCount(0), activities(new Activity*[100]), activitiesCount(0), accommodations(new Accommodation*[100]), accommodationsCount(0), guests(new Guest*[100]), guestsCount(0) {}
 
-Room::Room(int number, unsigned int numBeds) : number(number), numBeds(numBeds), reservations(new Reservation*[100]), reservationsCount(0), activities(new Activity*[100]), activitiesCount(0), accommodations(new Accommodation*[100]), accommodationsCount(0), guests(new Guest*[100]), guestsCount(0) {}
+Room::Room(int number, unsigned int numBeds) : number(number), numBeds(numBeds), reservations(new Reservation*[100]), reservationsCount(0), activities(new Activity*[100]), activitiesCount(0), accommodations(new Accommodation*[100]), accommodationsCount(0), guests(new Guest*[100]), guestsCount(0) {
+    if (number < -1000 || number > 1000) {
+        throw std::invalid_argument("Room number is out of range. Room number must be between -1000 and 1000.");
+    }
+    if (numBeds > 4) {
+        throw std::invalid_argument("Number of beds exceeds the maximum limit of 4.");
+    }
+}
 Room::~Room() {
     clearReservations();
     clearGuests();
