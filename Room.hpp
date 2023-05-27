@@ -21,39 +21,42 @@ public:
     Room(int number, unsigned int numBeds);
     ~Room();
 
-    int getNumber() const; //
-    unsigned int getNumberOfBeds() const; //
+    int getNumber() const;
+    unsigned int getNumberOfBeds() const;
 
-    Reservation** getReservations() const; //
-    unsigned int getReservationsCount() const; //
+    Reservation** getReservations() const;
+    unsigned int getReservationsCount() const;
 
-    Guest** getGuests() const; //
-    unsigned int getGuestsCount() const; //
+    Guest** getGuests() const;
+    unsigned int getGuestsCount() const;
 
-    Activity** getActivities() const; //
-    unsigned int getActivitiesCount() const; //
+    Activity** getActivities() const;
+    unsigned int getActivitiesCount() const;
 
-    Accommodation** getAccommodations() const; //
-    unsigned int getAccommodationsCount() const; //
+    Accommodation** getAccommodations() const;
+    unsigned int getAccommodationsCount() const;
 
-    void addReservation(const Reservation& reservation); //
-    void addActivity(const Activity& activity); //
-    void addGuest(const Guest& guest); //
+    void addReservation(const Reservation& reservation);
+    void addActivity(const Activity& activity);
+    void addGuest(const Guest& guest);
 
-    bool isReservedInPeriod(const std::string& from, const std::string& to) const; //
+    bool isReservedInPeriod(const std::string& from, const std::string& to) const;
     void addGuestToActivity(const std::string& activityName, Guest* guest);
-    void clearGuests(); //
-    void clearReservations(); // 
-    void checkout(); //
+    void clearGuests();
+    void clearReservations();
+    void checkout();
 
     void printRoomUsageReport(const std::string& from, const std::string& to) const;
-    int getUsageDays(const std::string& from, const std::string& to) const; //
+    int getUsageDays(const std::string& from, const std::string& to) const;
     void moveGuestsFromRoom(Room* sourceRoom);
 
-    bool isReservedOnDate(const std::string& currentDate) const; //
+    bool isReservedOnDate(const std::string& currentDate) const;
 
-    Guest* findGuestByName(const std::string& guestName) const; //
+    Guest* findGuestByName(const std::string& guestName) const;
     void printActivities() const;
+
+    /*std::string serialize() const override;
+    void deserialize(const std::string& data) override;*/
 };
 
 #ifdef TEST

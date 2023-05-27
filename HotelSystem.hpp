@@ -22,39 +22,42 @@ public:
     static HotelSystem* getInstance();
 
     ~HotelSystem();
-    void addEmergencyRoom(Room* room);
-    void addRoom(const Room* room); 
-    void addRoom(int roomNumber, unsigned int numBeds);
-    Room* getRoom(int roomNumber) const;
-    Room** getRooms() const;
-    unsigned int getRoomCount() const;
-    void printRooms() const;
+    void addEmergencyRoom(Room* room); //
+    void addRoom(const Room* room);  //
+    void addRoom(int roomNumber, unsigned int numBeds); //
+    Room* getRoom(int roomNumber) const; //
+    Room** getRooms() const; //
+    unsigned int getRoomCount() const; //
+    void printRooms() const; //
 
-    void makeReservation(int roomNumber, const std::string& checkIn, const std::string& checkOut, const std::string& note, unsigned int numGuests);
-    bool isRoomAvailable(const std::string& date) const;
-    void printAvailableRooms(const std::string& date) const;
+    void checkin(int roomNumber, const std::string& checkIn, const std::string& checkOut, const std::string& note, unsigned int numGuests); //
+    bool isRoomAvailable(const std::string& date) const; //
+    void printAvailableRooms(const std::string& date) const; //
 
-    void addActivity(const std::string& name);
-    void printActivities() const;
-    void printActivityGuests(const std::string& activityName) const;
+    void addActivity(const std::string& name); //
+    void printActivities() const; //
+    void printActivityGuests(const std::string& activityName) const; //
 
-    void addGuest(Guest* guest);
-    void addGuestToRoom(int roomNumber, Guest* guest);
-    void addGuestToActivity(const std::string& activityName, Guest* guest);
-    void printGuests() const;
-    Guest** getGuests() const;
-    unsigned int getNumGuests() const;
+    void addGuest(Guest* guest); //
+    void addGuestToRoom(int roomNumber, Guest* guest); //
+    void addGuestToActivity(const std::string& activityName, Guest* guest); //
+    void printGuests() const; //
+    Guest** getGuests() const; //
+    unsigned int getNumGuests() const; //
 
     std::string getCurrentDate() const;
-    void printRoomUsageReport(const std::string& from, const std::string& to) const;
-    Room* findAvailableRoom(unsigned int beds, const std::string& from, const std::string& to) const;
-    bool findEmergencyRoom(unsigned int beds, const std::string& from, const std::string& to);
-    void declareRoomUnavailable(int roomNumber, const std::string& from, const std::string& to, const std::string& note);
-    void addGuestToRoomActivity(int roomNumber, const std::string& activityName, Guest* guest);
-    void printRoomActivities(int roomNumber) const;
-    void checkout(int roomNumber);
-    Guest* findGuestByName(const std::string& guestName) const;
-    void addRoomActivity(int roomNumber, Activity* activity);
+    void printRoomUsageReport(const std::string& from, const std::string& to) const; //
+    Room* findAvailableRoom(unsigned int beds, const std::string& from, const std::string& to) const; //
+    bool findEmergencyRoom(unsigned int beds, const std::string& from, const std::string& to); //
+    void declareRoomUnavailable(int roomNumber, const std::string& from, const std::string& to, const std::string& note); //
+    void addGuestToRoomActivity(int roomNumber, const std::string& activityName, Guest* guest); //
+    void printRoomActivities(int roomNumber) const; //
+    void checkout(int roomNumber); //
+    Guest* findGuestByName(const std::string& guestName) const; //
+    void addRoomActivity(int roomNumber, Activity* activity); //
+
+    /*std::string serialize() const override;
+    void deserialize(const std::string& data) override;*/
 };
 
 #ifdef TEST

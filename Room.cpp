@@ -230,3 +230,16 @@ void Room::printActivities() const {
         }
     }
 }
+/*std::string Room::serialize() const{
+    std::stringstream ss;
+    ss << number << "," << numBeds;
+    return ss.str();
+}
+void Room::deserialize(const std::string& data){
+    std::stringstream ss(data);
+    std::string numberStr, numBedsStr;
+    std::getline(ss, numberStr, ',');
+    std::getline(ss, numBedsStr, ',');
+    number = std::stoi(numberStr);
+    numBeds = std::stoi(numBedsStr);
+}*/

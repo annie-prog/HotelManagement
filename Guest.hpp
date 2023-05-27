@@ -2,7 +2,7 @@
 #include <string>
 #include <stdexcept>
 
-class Guest {
+class Guest{
 private:
     std::string firstName;
     std::string lastName;
@@ -16,6 +16,9 @@ public:
     std::string getFirstName() const;
     std::string getLastName() const;
     std::string getPhoneNumber() const;
+
+    /*std::string serialize() const override;
+    void deserialize(const std::string& data) override;*/
 };
 
 #ifdef TEST

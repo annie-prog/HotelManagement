@@ -1,5 +1,6 @@
 #include "Guest.hpp"
 #include <cctype>
+#include <sstream>
 
 Guest::Guest(const std::string& firstName, const std::string& lastName, const std::string& phoneNumber) : firstName(firstName), lastName(lastName), phoneNumber(phoneNumber) {
     if (!isValidName(firstName) || !isValidName(lastName)) {
@@ -47,3 +48,15 @@ bool Guest::isValidPhoneNumber(const std::string& phoneNumber) const {
     }
     return true;
 }
+/*std::string Guest::serialize() const{
+    std::stringstream ss;
+    ss << firstName << "," << lastName << "," << phoneNumber;
+    return ss.str();
+}
+
+void Guest::deserialize(const std::string& data){
+    std::stringstream ss(data);
+    std::getline(ss, firstName, ',');
+    std::getline(ss, lastName, ',');
+    std::getline(ss, phoneNumber, ',');
+}*/

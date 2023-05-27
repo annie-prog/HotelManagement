@@ -130,7 +130,7 @@ void HotelSystem::printAvailableRooms(const std::string& date) const {
         std::cout << "No available rooms on " << currentDate << "!" << std::endl;
     }
 }
-void HotelSystem::makeReservation(int roomNumber, const std::string& checkIn, const std::string& checkOut, const std::string& note, unsigned int numGuests) {
+void HotelSystem::checkin(int roomNumber, const std::string& checkIn, const std::string& checkOut, const std::string& note, unsigned int numGuests) {
     Room* room = getRoom(roomNumber);
     if (room) {
         if (numGuests == 0) {
@@ -212,7 +212,7 @@ void HotelSystem::printGuests() const {
 
     std::cout << "Guests:" << std::endl;
     for (unsigned int i = 0; i < numGuests; i++) {
-        std::cout << guests[i]->getFirstName() << " " << guests[i]->getLastName() << std::endl;
+        std::cout << guests[i]->getFirstName() << " " << guests[i]->getLastName() << " " << guests[i]->getPhoneNumber() << std::endl;
     }
 }
 void HotelSystem::printRoomUsageReport(const std::string& from, const std::string& to) const {
@@ -362,3 +362,27 @@ void HotelSystem::addEmergencyRoom(Room* room) {
         std::cout << "Energency room added!" << std::endl;
     }
 }
+/*std::string HotelSystem::serialize() const{
+    std::stringstream ss;
+    for (const auto& room : rooms) {
+        ss << room->serialize() << '\n';
+    }
+    for (const auto& guest : guests) {
+        ss << guest->serialize() << '\n';
+    }
+    return ss.str();
+}
+void HotelSystem::deserialize(const std::string& data){
+    std::stringstream ss(data);
+    std::string line;
+    while (std::getline(ss, line) && !line.empty()) {
+        Room* room = new Room();
+        room->deserialize(line);
+        rooms.push_back(room);
+    }
+    while (std::getline(ss, line) && !line.empty()) {
+        Guest* guest = new Guest();
+        guest->deserialize(line);
+        guests.push_back(guest);
+    }
+}*/
