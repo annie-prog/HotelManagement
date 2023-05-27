@@ -1,12 +1,14 @@
 #pragma once
 #include <string>
 #include <stdexcept>
+#include <set>
 
 class Guest{
 private:
     std::string firstName;
     std::string lastName;
     std::string phoneNumber;
+    static std::set<std::string> phoneNumbersSet;
 private:
     bool isValidName(const std::string& name) const;
     bool isValidPhoneNumber(const std::string& phoneNumber) const;

@@ -352,24 +352,31 @@ int main() {
             hotel->addGuestToActivity(activityName, guest);
         }
         else if (command == "addguest") {
-            if (tokens.size() < 4) {
-                std::cout << "Invalid command. Please provide guest's first name, last name, and phone number." << std::endl;
-                continue;
-            }
-            std::string firstName = tokens[1];
-            std::string lastName = tokens[2];
-            std::string phoneNumber = tokens[3];
-            Guest* guest = new Guest(firstName, lastName, phoneNumber);
-            hotel->addGuest(guest);
+            try {
+                if (tokens.size() < 4) {
+                    std::cout << "Invalid command. Please provide guest's first name, last name, and phone number." << std::endl;
+                    continue;
+                }
+                std::string firstName = tokens[1];
+                std::string lastName = tokens[2];
+                std::string phoneNumber = tokens[3];
+                Guest* guest = new Guest(firstName, lastName, phoneNumber);
+                hotel->addGuest(guest);
 
-            std::string filename = "guests.csv";
+                std::string filename = "guests.csv";
 
-            std::vector<std::vector<std::string>> previousGuests = CSVUtils::readGuestsFromCSV(filename);
-            previousGuests.push_back({ firstName, lastName, phoneNumber });
+                std::vector<std::vector<std::string>> previousGuests = CSVUtils::readGuestsFromCSV(filename);
+                previousGuests.push_back({ firstName, lastName, phoneNumber });
 
-            CSVUtils::saveGuestsToCSV(previousGuests, filename);
+                CSVUtils::saveGuestsToCSV(previousGuests, filename);
 
-            std::cout << "Guest " << firstName << " " << lastName << " has been added and saved to " << filename << std::endl;
+                std::cout << "Guest " << firstName << " " << lastName << " has been added and saved to " << filename << std::endl;
+            } 
+            catch (const std::invalid_argument& e) {
+                std::cerr << "Error: " << e.what() << std::endl;
+                CSVUtils::clearCSVFiles();
+                return 0;
+            }         
         }
         else if (command == "printguests") {
             if (!isOpen) {

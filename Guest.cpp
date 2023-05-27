@@ -2,6 +2,8 @@
 #include <cctype>
 #include <sstream>
 
+std::set<std::string> Guest::phoneNumbersSet;
+
 Guest::Guest(const std::string& firstName, const std::string& lastName, const std::string& phoneNumber) : firstName(firstName), lastName(lastName), phoneNumber(phoneNumber) {
     if (!isValidName(firstName) || !isValidName(lastName)) {
         throw std::invalid_argument("Invalid name. Name must consist of letters only.");
@@ -9,20 +11,26 @@ Guest::Guest(const std::string& firstName, const std::string& lastName, const st
     if (!isValidPhoneNumber(phoneNumber)) {
         throw std::invalid_argument("Invalid phone number. Phone number must consist of digits only.");
     }
-    if(phoneNumber.size() > 13){
+    if (phoneNumber.size() > 13) {
         throw std::invalid_argument("Phone number is longer than it should.");
     }
-    if(phoneNumber.size() < 10){
+    if (phoneNumber.size() < 10) {
         throw std::invalid_argument("Phone number is shorter than it should.");
     }
-    if((firstName.size() > 20) || lastName.size() > 20){
+    if ((firstName.size() > 20) || (lastName.size() > 20)) {
         throw std::invalid_argument("Name is longer than it should.");
     }
-    if((firstName.size() < 2) || lastName.size() < 2){
+    if ((firstName.size() < 2) || (lastName.size() < 2)) {
         throw std::invalid_argument("Name is shorter than it should.");
     }
+    if (phoneNumbersSet.find(phoneNumber) != phoneNumbersSet.end()) {
+        throw std::invalid_argument("Phone number already exists.");
+    }
+    phoneNumbersSet.insert(phoneNumber);
 }
-Guest::~Guest() = default;
+Guest::~Guest() {
+    phoneNumbersSet.erase(phoneNumber);
+}
 std::string Guest::getFirstName() const {
     return this->firstName;
 }
