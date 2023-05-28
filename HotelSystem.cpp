@@ -54,8 +54,6 @@ void HotelSystem::addRoom(const Room* room) {
     delete[] rooms;
     rooms = newRooms;
     roomCount++;
-
-    std::cout << "Room added successfully." << std::endl;
 }
 Room** HotelSystem::getRooms() const {
     return this->rooms;
@@ -70,7 +68,7 @@ unsigned int HotelSystem::getNumGuests() const {
     return accommodation->getNumGuests();
 }
 void HotelSystem::printRooms() const {
-    std::cout << "Rooms:" << std::endl;
+    std::cout << "Rooms in the hotel:" << std::endl;
     for (unsigned int i = 0; i < roomCount; i++) {
         std::cout << "Room " << rooms[i]->getNumber() << ", Beds: " << rooms[i]->getNumberOfBeds() << std::endl;
     }
@@ -139,7 +137,8 @@ void HotelSystem::checkin(int roomNumber, const std::string& checkIn, const std:
 
         Reservation* reservation = new Reservation(roomNumber, checkIn, checkOut, note);
         room->addReservation(*reservation);
-        std::cout << "Reservation made successfully." << std::endl;
+        unsigned int usageDays = room->getUsageDays(checkIn, checkOut);
+        std::cout << "Reservation made successfully. You have to pay " << ((usageDays - 1) * PRICE_PER_NIGHT_PER_PERSON * numGuests) << "lv." << std::endl;
     } 
     else {
         std::cout << "Room not found." << std::endl;
@@ -177,12 +176,9 @@ void HotelSystem::addActivity(const std::string& name) {
     delete[] activities;
     activities = newActivities;
     activitiesCount++;
-
-    std::cout << "Activity added successfully." << std::endl;
 }
 void HotelSystem::addGuest(Guest* guest) {
     accommodation->addGuest(*guest);
-    std::cout << "Guest added successfully." << std::endl;
 }
 void HotelSystem::addGuestToActivity(const std::string& activityName, Guest* guest) {
     Activity* activity = nullptr;
@@ -229,13 +225,19 @@ void HotelSystem::printRoomUsageReport(const std::string& from, const std::strin
     }
 }
 Room* HotelSystem::findAvailableRoom(unsigned int beds, const std::string& from, const std::string& to) const {
+    Room* bestRoom = nullptr;
+    unsigned int minBeds = std::numeric_limits<unsigned int>::max();
+
     for (unsigned int i = 0; i < roomCount; i++) {
         Room* room = rooms[i];
         if (!room->isReservedInPeriod(from, to) && room->getNumberOfBeds() >= beds) {
-            return room;
+            if (room->getNumberOfBeds() < minBeds) {
+                minBeds = room->getNumberOfBeds();
+                bestRoom = room;
+            }
         }
     }
-    return nullptr;
+    return bestRoom;
 }
 bool HotelSystem::findEmergencyRoom(unsigned int beds, const std::string& from, const std::string& to) {
     Room* preferredRoom = nullptr;
@@ -362,27 +364,3 @@ void HotelSystem::addEmergencyRoom(Room* room) {
         std::cout << "Energency room added!" << std::endl;
     }
 }
-/*std::string HotelSystem::serialize() const{
-    std::stringstream ss;
-    for (const auto& room : rooms) {
-        ss << room->serialize() << '\n';
-    }
-    for (const auto& guest : guests) {
-        ss << guest->serialize() << '\n';
-    }
-    return ss.str();
-}
-void HotelSystem::deserialize(const std::string& data){
-    std::stringstream ss(data);
-    std::string line;
-    while (std::getline(ss, line) && !line.empty()) {
-        Room* room = new Room();
-        room->deserialize(line);
-        rooms.push_back(room);
-    }
-    while (std::getline(ss, line) && !line.empty()) {
-        Guest* guest = new Guest();
-        guest->deserialize(line);
-        guests.push_back(guest);
-    }
-}*/

@@ -113,7 +113,6 @@ void Room::clearReservations() {
 void Room::checkout() {
     clearGuests();
     clearReservations();
-    std::cout << "Room checked out successfully." << std::endl;
 }
 void Room::printRoomUsageReport(const std::string& from, const std::string& to) const {
     std::cout << "Room " << number << " usage report:" << std::endl;

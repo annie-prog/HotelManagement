@@ -54,9 +54,6 @@ public:
 
     Guest* findGuestByName(const std::string& guestName) const;
     void printActivities() const;
-
-    /*std::string serialize() const override;
-    void deserialize(const std::string& data) override;*/
 };
 
 #ifdef TEST

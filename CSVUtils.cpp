@@ -2,61 +2,6 @@
 #include <iostream>
 #include <sstream>
 
-bool CSVUtils::CheckExtension(const std::string& name) {
-    int size = name.size();
-    if (name[size - 1] != 'v' && name[size - 1] != 'V')
-        return false;
-    if (name[size - 2] != 's' && name[size - 2] != 'S')
-        return false;
-    if (name[size - 3] != 'c' && name[size - 3] != 'C')
-        return false;
-    if (name[size - 4] != '.')
-        return false;
-    return true;
-}
-bool CSVUtils::CheckForbiddenLetters(const std::string& name) {
-    const char forbidden[] = "/\\?%*\";:|<>.,=";
-    int size = name.size();
-    for (int i = 0; i < size - 4; i++) {
-        for (int j = 0; j < 15; j++) {
-            if (name[i] == forbidden[j])
-                return false;
-        }
-    }
-    return true;
-}
-bool CSVUtils::FileNameCheck(const std::string& name) {
-    int size = name.size();
-    if (size <= 4) {
-        std::cout << "Filename is wrong." << std::endl;
-        return false;
-    }
-    if (CheckForbiddenLetters(name) == false) {
-        std::cout << "Forbidden symbols in the file name." << std::endl;
-        return false;
-    }
-    if (CheckExtension(name) == false) {
-        std::cout << "Extension is wrong." << std::endl;
-        return false;
-    }
-
-    return true;
-}
-int CSVUtils::LinesCounter(std::ifstream& file) {
-    int count = 0;
-    char a;
-    while (file.get(a)) {
-        if (a == '\n') {
-            count++;
-        }
-    }
-    if (file.eof() && count != 0) {
-        count++;
-    }
-    file.clear();
-    file.seekg(0, std::ios::beg);
-    return count;
-}
 void CSVUtils::saveGuestsToCSV(const std::vector<std::vector<std::string>>& guests, const std::string& filename) {
     std::ofstream file(filename);
 
@@ -76,7 +21,6 @@ void CSVUtils::saveGuestsToCSV(const std::vector<std::vector<std::string>>& gues
     }
 
     file.close();
-    std::cout << "Allocated correctly" << std::endl;
 }
 std::vector<std::vector<std::string>> CSVUtils::readGuestsFromCSV(const std::string& filename) {
     std::vector<std::vector<std::string>> guests;
@@ -115,56 +59,6 @@ void CSVUtils::printGuests(const std::vector<std::vector<std::string>>& guests) 
         std::cout << std::endl;
     }
 }
-void CSVUtils::saveGuestsToCSV(const Accommodation& accommodation, const std::string& filename) {
-    std::ofstream file(filename);
-
-    if (!file.is_open()) {
-        std::cout << "Error with opening the file " << filename << std::endl;
-        return;
-    }
-
-    Guest** guests = accommodation.getGuests();
-    unsigned int numGuests = accommodation.getNumGuests();
-
-    for (unsigned int i = 0; i < numGuests; i++) {
-        file << guests[i]->getFirstName() << ","
-             << guests[i]->getLastName() << ","
-             << guests[i]->getPhoneNumber() << ",\n";
-    }
-
-    file.close();
-    std::cout << "Allocated successfully" << std::endl;
-}
-void CSVUtils::printGuestsFromCSV(const std::string& filename) {
-    std::ifstream file(filename);
-
-    if (!file.is_open()) {
-        std::cout << "Error with opening the file " << filename << std::endl;
-        return;
-    }
-
-    std::string line;
-    while (std::getline(file, line)) {
-        std::vector<std::string> tokens;
-        size_t pos = 0;
-        std::string token;
-        while ((pos = line.find(',')) != std::string::npos) {
-            token = line.substr(0, pos);
-            tokens.push_back(token);
-            line.erase(0, pos + 1);
-        }
-        tokens.push_back(line);
-
-        if (tokens.size() == 3) {
-            std::cout << "First Name: " << tokens[0] << std::endl;
-            std::cout << "Last Name: " << tokens[1] << std::endl;
-            std::cout << "Phone Number: " << tokens[2] << std::endl;
-            std::cout << std::endl;
-        }
-    }
-
-    file.close();
-}
 void CSVUtils::saveActivitiesToCSV(const std::vector<std::string>& activities, const std::string& filename) {
     std::ofstream file(filename);
 
@@ -178,9 +72,9 @@ void CSVUtils::saveActivitiesToCSV(const std::vector<std::string>& activities, c
     }
 
     file.close();
-    std::cout << "Allocated successfully " << filename << std::endl;
 }
 std::vector<std::string> CSVUtils::readActivitiesFromCSV(const std::string& filename) {
+    std::vector<std::string> activities;
     std::ifstream file(filename);
 
     if (!file.is_open()) {
@@ -188,14 +82,12 @@ std::vector<std::string> CSVUtils::readActivitiesFromCSV(const std::string& file
         return {};
     }
 
-    std::vector<std::string> activities;
-    std::string activity;
-
-    while (std::getline(file, activity, ',')) {
-        if (!activity.empty() && activity.back() == '\n') {
-            activity.pop_back();
+    std::string line;
+    while (std::getline(file, line)) {
+        if (!line.empty() && line.back() == ',') {
+            line.pop_back();
         }
-        activities.push_back(activity);
+        activities.push_back(line);
     }
 
     file.close();
@@ -217,7 +109,6 @@ void CSVUtils::saveReservationsToCSV(const std::vector<std::vector<std::string>>
     }
 
     file.close();
-    std::cout << "Allocated successfully " << filename << std::endl;
 }
 std::vector<std::vector<std::string>> CSVUtils::readReservationsFromCSV(const std::string& filename) {
     std::vector<std::vector<std::string>> reservations;
@@ -268,7 +159,6 @@ void CSVUtils::createCSVFile(const std::string& filename, const std::vector<std:
     }
 
     file.close();
-    //std::cout << "CSV file created: " << filename << std::endl;
 }
 std::vector<std::vector<std::string>> CSVUtils::readCSVFile(const std::string& filename) {
     std::vector<std::vector<std::string>> data;
@@ -303,11 +193,7 @@ void CSVUtils::printCSVData(const std::vector<std::vector<std::string>>& data) {
         std::cout << "\n";
     }
 }
-void CSVUtils::clearCSVFiles() {
-    std::vector<std::string> filenames = { "guests.csv", "activities.csv", "reservations.csv", "rooms.csv", "accommodations.csv" };
-
-    for (const auto& filename : filenames) {
-        std::ofstream file(filename);
-        file.close();
-    }
+void CSVUtils::clearCSVFiles(const std::string& filename) {
+    std::ofstream file(filename);
+    file.close();
 }
