@@ -2,7 +2,7 @@
 #include <iostream>
 #include <sstream>
 
-void CSVUtils::saveGuestsToCSV(const std::vector<std::vector<std::string>>& guests, const std::string& filename) {
+void CSVUtils::SaveGuestsToCSV(const std::vector<std::vector<std::string>>& guests, const std::string& filename) {
     std::ofstream file(filename);
 
     if (!file.is_open()) {
@@ -22,7 +22,7 @@ void CSVUtils::saveGuestsToCSV(const std::vector<std::vector<std::string>>& gues
 
     file.close();
 }
-std::vector<std::vector<std::string>> CSVUtils::readGuestsFromCSV(const std::string& filename) {
+std::vector<std::vector<std::string>> CSVUtils::ReadGuestsFromCSV(const std::string& filename) {
     std::vector<std::vector<std::string>> guests;
     std::ifstream file(filename);
 
@@ -51,7 +51,7 @@ std::vector<std::vector<std::string>> CSVUtils::readGuestsFromCSV(const std::str
 
     return guests;
 }
-void CSVUtils::printGuests(const std::vector<std::vector<std::string>>& guests) {
+void CSVUtils::PrintGuests(const std::vector<std::vector<std::string>>& guests) {
     for (const auto& guest : guests) {
         for (const auto& data : guest) {
             std::cout << data << " ";
@@ -59,7 +59,7 @@ void CSVUtils::printGuests(const std::vector<std::vector<std::string>>& guests) 
         std::cout << std::endl;
     }
 }
-void CSVUtils::saveActivitiesToCSV(const std::vector<std::string>& activities, const std::string& filename) {
+void CSVUtils::SaveActivitiesToCSV(const std::vector<std::string>& activities, const std::string& filename) {
     std::ofstream file(filename);
 
     if (!file.is_open()) {
@@ -73,7 +73,7 @@ void CSVUtils::saveActivitiesToCSV(const std::vector<std::string>& activities, c
 
     file.close();
 }
-std::vector<std::string> CSVUtils::readActivitiesFromCSV(const std::string& filename) {
+std::vector<std::string> CSVUtils::ReadActivitiesFromCSV(const std::string& filename) {
     std::vector<std::string> activities;
     std::ifstream file(filename);
 
@@ -93,7 +93,7 @@ std::vector<std::string> CSVUtils::readActivitiesFromCSV(const std::string& file
     file.close();
     return activities;
 }
-void CSVUtils::saveReservationsToCSV(const std::vector<std::vector<std::string>>& reservations, const std::string& filename) {
+void CSVUtils::SaveReservationsToCSV(const std::vector<std::vector<std::string>>& reservations, const std::string& filename) {
     std::ofstream file(filename);
 
     if (!file.is_open()) {
@@ -110,7 +110,7 @@ void CSVUtils::saveReservationsToCSV(const std::vector<std::vector<std::string>>
 
     file.close();
 }
-std::vector<std::vector<std::string>> CSVUtils::readReservationsFromCSV(const std::string& filename) {
+std::vector<std::vector<std::string>> CSVUtils::ReadReservationsFromCSV(const std::string& filename) {
     std::vector<std::vector<std::string>> reservations;
     std::ifstream file(filename);
 
@@ -135,7 +135,7 @@ std::vector<std::vector<std::string>> CSVUtils::readReservationsFromCSV(const st
     file.close();
     return reservations;
 }
-void CSVUtils::printReservations(const std::vector<std::vector<std::string>>& reservations) {
+void CSVUtils::PrintReservations(const std::vector<std::vector<std::string>>& reservations) {
     for (const auto& reservation : reservations) {
         for (const auto& field : reservation) {
             std::cout << field << ",";
@@ -143,7 +143,7 @@ void CSVUtils::printReservations(const std::vector<std::vector<std::string>>& re
         std::cout << "\n";
     }
 }
-void CSVUtils::createCSVFile(const std::string& filename, const std::vector<std::vector<std::string>>& data) {
+void CSVUtils::CreateCSVFile(const std::string& filename, const std::vector<std::vector<std::string>>& data) {
     std::ofstream file(filename);
 
     if (!file.is_open()) {
@@ -160,7 +160,7 @@ void CSVUtils::createCSVFile(const std::string& filename, const std::vector<std:
 
     file.close();
 }
-std::vector<std::vector<std::string>> CSVUtils::readCSVFile(const std::string& filename) {
+std::vector<std::vector<std::string>> CSVUtils::ReadCSVFile(const std::string& filename) {
     std::vector<std::vector<std::string>> data;
     std::ifstream file(filename);
 
@@ -185,7 +185,7 @@ std::vector<std::vector<std::string>> CSVUtils::readCSVFile(const std::string& f
     file.close();
     return data;
 }
-void CSVUtils::printCSVData(const std::vector<std::vector<std::string>>& data) {
+void CSVUtils::PrintCSVData(const std::vector<std::vector<std::string>>& data) {
     for (const auto& row : data) {
         for (const auto& field : row) {
             std::cout << field << ",";
@@ -193,7 +193,7 @@ void CSVUtils::printCSVData(const std::vector<std::vector<std::string>>& data) {
         std::cout << "\n";
     }
 }
-void CSVUtils::clearCSVFiles(const std::string& filename) {
+void CSVUtils::ClearCSVFiles(const std::string& filename) {
     std::ofstream file(filename);
     file.close();
 }

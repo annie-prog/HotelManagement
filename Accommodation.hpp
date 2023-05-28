@@ -8,13 +8,13 @@ private:
 public:
     Accommodation();
     ~Accommodation();
-    void addGuest(const Guest& guest);
-    Guest** getGuests() const;
-    unsigned int getNumGuests() const;
+    void AddGuest(const Guest& guest);
+    Guest** GetGuests() const;
+    unsigned int GetNumGuests() const;
     
-    void setGuests(Guest** guests);
-    void setNumGuests(unsigned int numGuests);
-    void clearGuests();
+    void SetGuests(Guest** guests);
+    void SetNumGuests(unsigned int numGuests);
+    void ClearGuests();
 };
 
 #ifdef TEST
@@ -24,33 +24,33 @@ public:
 TEST_SUITE("Accommodation") {
     TEST_CASE("Add Guest") {
         Accommodation accommodation;
-        Guest guest("John", "Doe", "12345678932");
+        Guest guest("Aneliya", "Konarcheva", "0746375867");
 
-        accommodation.addGuest(guest);
+        accommodation.AddGuest(guest);
 
-        CHECK_EQ(accommodation.getNumGuests(), 1);
-        CHECK_EQ(accommodation.getGuests()[0]->getFirstName(), "John");
-        CHECK_EQ(accommodation.getGuests()[0]->getLastName(), "Doe");
-        CHECK_EQ(accommodation.getGuests()[0]->getPhoneNumber(), "12345678932");
+        CHECK_EQ(accommodation.GetNumGuests(), 1);
+        CHECK_EQ(accommodation.GetGuests()[0]->GetFirstName(), "Aneliya");
+        CHECK_EQ(accommodation.GetGuests()[0]->GetLastName(), "Konarcheva");
+        CHECK_EQ(accommodation.GetGuests()[0]->GetPhoneNumber(), "0746375867");
     }
 
     TEST_CASE("Get Guests") {
         Accommodation accommodation;
-        Guest guest1("John", "Doe", "12345678932");
-        Guest guest2("Jane", "Smith", "98765432143");
+        Guest guest1("Aneliya", "Konarcheva", "0746375867");
+        Guest guest2("Blagovesta", "Hubanova", "0837485768");
 
-        accommodation.addGuest(guest1);
-        accommodation.addGuest(guest2);
+        accommodation.AddGuest(guest1);
+        accommodation.AddGuest(guest2);
 
-        Guest** guests = accommodation.getGuests();
+        Guest** guests = accommodation.GetGuests();
 
-        CHECK_EQ(accommodation.getNumGuests(), 2);
-        CHECK_EQ(guests[0]->getFirstName(), "John");
-        CHECK_EQ(guests[0]->getLastName(), "Doe");
-        CHECK_EQ(guests[0]->getPhoneNumber(), "12345678932");
-        CHECK_EQ(guests[1]->getFirstName(), "Jane");
-        CHECK_EQ(guests[1]->getLastName(), "Smith");
-        CHECK_EQ(guests[1]->getPhoneNumber(), "98765432143");
+        CHECK_EQ(accommodation.GetNumGuests(), 2);
+        CHECK_EQ(guests[0]->GetFirstName(), "Aneliya");
+        CHECK_EQ(guests[0]->GetLastName(), "Konarcheva");
+        CHECK_EQ(guests[0]->GetPhoneNumber(), "0746375867");
+        CHECK_EQ(guests[1]->GetFirstName(), "Blagovesta");
+        CHECK_EQ(guests[1]->GetLastName(), "Hubanova");
+        CHECK_EQ(guests[1]->GetPhoneNumber(), "0837485768");
     }
 }
 #endif

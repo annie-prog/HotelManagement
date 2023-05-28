@@ -6,72 +6,72 @@
 
 Reservation::Reservation(const std::string& checkInDate, const std::string& checkOutDate)
     : roomNumber(0), checkInDate(checkInDate), checkOutDate(checkOutDate) {
-        if (!isValidDate(checkInDate) || !isValidDate(checkOutDate)) {
-            throw std::invalid_argument("Invalid data. Data must consist of digits and dashes only.");
+        if (!IsValidDate(checkInDate) || !IsValidDate(checkOutDate)) {
+            throw std::invalid_argument("Invalid data. Data must have only digits and dashes.");
         }
 }
 Reservation::Reservation(const std::string& checkInDate, const std::string& checkOutDate, const std::string& note)
     : roomNumber(0), checkInDate(checkInDate), checkOutDate(checkOutDate), note(note) {
-        if (!isValidDate(checkInDate) || !isValidDate(checkOutDate)) {
-            throw std::invalid_argument("Invalid data. Data must consist of digits and dashes only.");
+        if (!IsValidDate(checkInDate) || !IsValidDate(checkOutDate)) {
+            throw std::invalid_argument("Invalid data. Data must have only digits and dashes.");
         }
         if (note.size() < 2) {
-            throw std::invalid_argument("Note is shorter than it should.");
+            throw std::invalid_argument("Too short note.");
         }
         if (note.size() > 20) {
-            throw std::invalid_argument("Note is longer than it should.");
+            throw std::invalid_argument("Too long note.");
         }
 }
 Reservation::Reservation(int roomNumber, const std::string& checkInDate, const std::string& checkOutDate, const std::string& note)
     : roomNumber(roomNumber), checkInDate(checkInDate), checkOutDate(checkOutDate), note(note) {
-        if (!isValidDate(checkInDate) || !isValidDate(checkOutDate)) {
-            throw std::invalid_argument("Invalid data. Data must consist of digits and dashes only.");
+        if (!IsValidDate(checkInDate) || !IsValidDate(checkOutDate)) {
+            throw std::invalid_argument("Invalid data. Data must have only digits and dashes.");
         }
         if (note.size() < 2) {
-            throw std::invalid_argument("Note is shorter than it should.");
+            throw std::invalid_argument("Too short note.");
         }
         if (note.size() > 20) {
-            throw std::invalid_argument("Note is longer than it should.");
+            throw std::invalid_argument("Too long note.");
         }
-        if (!isValidRoomNumber(roomNumber)) {
-            throw std::invalid_argument("Invalid room number. Room number must consist of digits and only.");
+        if (!IsValidRoomNumber(roomNumber)) {
+            throw std::invalid_argument("Invalid room number. Room number must have only digits.");
         }
 }    
 Reservation::~Reservation() = default;
-int Reservation::getRoomNumber() const {
+int Reservation::GetRoomNumber() const {
     return this->roomNumber;
 }
-void Reservation::setRoomNumber(int roomNumber) {
+void Reservation::SetRoomNumber(int roomNumber) {
     this->roomNumber = roomNumber;
 }
-std::string Reservation::getCheckInDate() const {
+std::string Reservation::GetCheckInDate() const {
     return this->checkInDate;
 }
-void Reservation::setCheckInDate(const std::string& checkIn) {
-    if (!isValidDate(checkIn)) {
-        throw std::invalid_argument("Invalid data. Data must consist of digits and dashes only.");
+void Reservation::SetCheckInDate(const std::string& checkIn) {
+    if (!IsValidDate(checkIn)) {
+        throw std::invalid_argument("Invalid data. Data must have only digits and dashes.");
     }
     this->checkInDate = checkIn;
 }
-std::string Reservation::getCheckOutDate() const {
+std::string Reservation::GetCheckOutDate() const {
     return this->checkOutDate;
 }
-void Reservation::setCheckOutDate(const std::string& checkOut) {
-    if (!isValidDate(checkOut)) {
-        throw std::invalid_argument("Invalid data. Data must consist of digits and dashes only.");
+void Reservation::SetCheckOutDate(const std::string& checkOut) {
+    if (!IsValidDate(checkOut)) {
+        throw std::invalid_argument("Invalid data. Data must have only digits and dashes.");
     }
     checkOutDate = checkOut;
 }
-std::string Reservation::getNote() const {
-    return note;
+std::string Reservation::GetNote() const {
+    return this->note;
 }
-void Reservation::checkNote(const std::string& note) {
+void Reservation::CheckNote(const std::string& note) {
     this->note = note;
 }
-Accommodation& Reservation::getAccommodation() {
+Accommodation& Reservation::GetAccommodation() {
     return this->accommodation;
 }
-bool Reservation::includesDate(const std::string& currentDate) const {
+bool Reservation::IncludesDate(const std::string& currentDate) const {
     std::tm tm_current = {};
     std::istringstream iss_current(currentDate);
     iss_current >> std::get_time(&tm_current, "%Y-%m-%d");
@@ -90,7 +90,7 @@ bool Reservation::includesDate(const std::string& currentDate) const {
 
     return (time_current >= time_checkIn) && (time_current <= time_checkOut);
 }
-bool Reservation::isValidDate(const std::string& date) {
+bool Reservation::IsValidDate(const std::string& date) {
     std::regex iso8601Pattern("^\\d{4}-\\d{2}-\\d{2}$");
     if (!std::regex_match(date, iso8601Pattern)) {
         return false;
@@ -118,12 +118,12 @@ bool Reservation::isValidDate(const std::string& date) {
 
     return true;
 }
-bool Reservation::isValidRoomNumber(int roomNumber) const {
+bool Reservation::IsValidRoomNumber(int roomNumber) const {
     return (roomNumber >= -1000) && (roomNumber <= 1000);
 }
-Guest** Reservation::getGuests() const {
-    return accommodation.getGuests();
+Guest** Reservation::GetGuests() const {
+    return accommodation.GetGuests();
 }
-int Reservation::getNumGuests() const {
-    return accommodation.getNumGuests();
+int Reservation::GetNumGuests() const {
+    return accommodation.GetNumGuests();
 }

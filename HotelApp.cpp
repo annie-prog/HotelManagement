@@ -7,29 +7,29 @@
 #include <algorithm>
 
 HotelApp::HotelApp() {
-    hotel = HotelSystem::getInstance();
+    hotel = HotelSystem::GetInstance();
 }
-void HotelApp::run() {
-    printWelcomeMessage();
+void HotelApp::Run() {
+    PrintWelcomeMessage();
 
     while (true) {
-        std::string input = getUserInput();
-        processCommand(input);
+        std::string input = GetUserInput();
+        ProcessCommand(input);
     }
 }
-void HotelApp::printWelcomeMessage() {
+void HotelApp::PrintWelcomeMessage() {
     std::cout << "°°°°°°°°°°°°°°°°°°°°°°°°" << std::endl;
     std::cout << "Welcome to hotel 'Amelia Resort'! " << std::endl;
     std::cout << "Type 'help' for a list of supported commands." << std::endl;
     std::cout << "°°°°°°°°°°°°°°°°°°°°°°°°" << std::endl;
 }
-std::string HotelApp::getUserInput() {
+std::string HotelApp::GetUserInput() {
     std::string input;
     std::cout << "> ";
     std::getline(std::cin, input);
     return input;
 }
-void HotelApp::processOpenCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessOpenCommand(const std::vector<std::string>& tokens) {
     if (isOpen) {
         std::cout << "A file is already open. Close it before opening another file." << std::endl;
         return;
@@ -53,7 +53,7 @@ void HotelApp::processOpenCommand(const std::vector<std::string>& tokens) {
         currentFile = filePath;
     }
 }
-void HotelApp::processCloseCommand() {
+void HotelApp::ProcessCloseCommand() {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -62,14 +62,14 @@ void HotelApp::processCloseCommand() {
     isOpen = false;
     currentFile = "";
 }
-void HotelApp::processSaveCommand() {
+void HotelApp::ProcessSaveCommand() {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
     }
     std::cout << "Successfully saved " << currentFile << std::endl;
 }
-void HotelApp::processSaveAsCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessSaveAsCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -96,7 +96,7 @@ void HotelApp::processSaveAsCommand(const std::vector<std::string>& tokens) {
 
     std::cout << "Successfully saved as " << newFilePath << std::endl;
 }
-void HotelApp::printHelp() {
+void HotelApp::PrintHelp() {
     std::cout << "The following commands are supported:" << std::endl;
     std::cout << "open <file>                                                                 opens <file>" << std::endl;
     std::cout << "close                                                                       closes currently opened file" << std::endl;
@@ -123,41 +123,51 @@ void HotelApp::printHelp() {
     std::cout << "addEmergencyRoom <room> <beds>                                              adds an emergency room if there are no available rooms for a specified period" << std::endl;
     std::cout << "exit                                                                        exits the program" << std::endl;
 }
-void HotelApp::processCheckinCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessCheckinCommand(const std::vector<std::string>& tokens) {
     try {
         if (!isOpen) {
             std::cout << "No file is currently open." << std::endl;
             return;
         }
-        if (tokens.size() < 6) {
-            std::cout << "Invalid command. Please provide room number, check-in date, check-out date, note, and number of guests." << std::endl;
+        if (tokens.size() < 5) {
+            std::cout << "Invalid command. Please provide room number, check-in date, check-out date, note." << std::endl;
             return;
         }
         int roomNumber = std::stoi(tokens[1]);
         std::string checkIn = tokens[2];
         std::string checkOut = tokens[3];
         std::string note = tokens[4];
-        unsigned int numGuests = std::stoi(tokens[5]);
+        unsigned int numGuests = 0;
 
-        hotel->checkin(roomNumber, checkIn, checkOut, note, numGuests);
+        if (tokens.size() >= 6) {
+            numGuests = std::stoi(tokens[5]);
+        } 
+        else {
+            Room* room = hotel->GetRoom(roomNumber);
+            if (room) {
+                numGuests = room->GetNumberOfBeds();
+            }
+        }
+
+        hotel->Checkin(roomNumber, checkIn, checkOut, note, numGuests);
 
         if (currentFile.empty()) {
             std::cout << "No filename specified. Cannot save the rooms." << std::endl;
             return;
         }
 
-        std::vector<std::vector<std::string>> previousRooms = CSVUtils::readReservationsFromCSV(currentFile);
+        std::vector<std::vector<std::string>> previousRooms = CSVUtils::ReadReservationsFromCSV(currentFile);
         previousRooms.push_back({ std::to_string(roomNumber), checkIn, checkOut, note, std::to_string(numGuests) });
 
-        CSVUtils::saveReservationsToCSV(previousRooms, currentFile);
+        CSVUtils::SaveReservationsToCSV(previousRooms, currentFile);
     }
     catch (const std::invalid_argument& e) {
         std::cerr << "Error: " << e.what() << std::endl;
-        CSVUtils::clearCSVFiles(currentFile);
+        CSVUtils::ClearCSVFiles(currentFile);
         return;
     }
 }
-void HotelApp::processCheckoutCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessCheckoutCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -167,10 +177,10 @@ void HotelApp::processCheckoutCommand(const std::vector<std::string>& tokens) {
         return;
     }
     int roomNumber = std::stoi(tokens[1]);
-    hotel->checkout(roomNumber);
+    hotel->Checkout(roomNumber);
 
     std::string filename = currentFile;
-    std::vector<std::vector<std::string>> reservationsData = CSVUtils::readReservationsFromCSV(filename);
+    std::vector<std::vector<std::string>> reservationsData = CSVUtils::ReadReservationsFromCSV(filename);
 
     std::vector<std::vector<std::string>> updatedReservationsData;
 
@@ -180,9 +190,9 @@ void HotelApp::processCheckoutCommand(const std::vector<std::string>& tokens) {
         }
     }
 
-    CSVUtils::saveReservationsToCSV(updatedReservationsData, filename);
+    CSVUtils::SaveReservationsToCSV(updatedReservationsData, filename);
 }
-void HotelApp::processAvailabilityCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessAvailabilityCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -204,17 +214,17 @@ void HotelApp::processAvailabilityCommand(const std::vector<std::string>& tokens
     std::cout.rdbuf(file.rdbuf());
 
     if (date.empty()) {
-        std::string currentDate = hotel->getCurrentDate();
-        hotel->printAvailableRooms(currentDate);
+        std::string currentDate = hotel->GetCurrentDate();
+        hotel->PrintAvailableRooms(currentDate);
     } 
     else {
-        hotel->printAvailableRooms(date);
+        hotel->PrintAvailableRooms(date);
     }
 
     std::cout.rdbuf(coutBuffer);
     file.close();
 }
-void HotelApp::processReportCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessReportCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -242,13 +252,13 @@ void HotelApp::processReportCommand(const std::vector<std::string>& tokens) {
     std::streambuf* coutBuffer = std::cout.rdbuf();
     std::cout.rdbuf(file.rdbuf());
 
-    hotel->printRoomUsageReport(from, to);
+    hotel->PrintRoomUsageReport(from, to);
 
     std::cout.rdbuf(coutBuffer);
 
     file.close();
 }
-void HotelApp::processFindCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessFindCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -272,9 +282,9 @@ void HotelApp::processFindCommand(const std::vector<std::string>& tokens) {
     std::streambuf* coutBuffer = std::cout.rdbuf();
     std::cout.rdbuf(file.rdbuf());
 
-    Room* availableRoom = hotel->findAvailableRoom(beds, from, to);
+    Room* availableRoom = hotel->FindAvailableRoom(beds, from, to);
     if (availableRoom != nullptr) {
-        std::cout << "Found available room: Room " << availableRoom->getNumber() << std::endl;
+        std::cout << "Found available room: Room " << availableRoom->GetNumber() << std::endl;
     } 
     else {
         std::cout << "No available room found." << std::endl;
@@ -284,7 +294,7 @@ void HotelApp::processFindCommand(const std::vector<std::string>& tokens) {
 
     file.close();
 }
-void HotelApp::processFindEmergencyCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessFindEmergencyCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -308,7 +318,7 @@ void HotelApp::processFindEmergencyCommand(const std::vector<std::string>& token
     std::streambuf* coutBuffer = std::cout.rdbuf();
     std::cout.rdbuf(file.rdbuf());
 
-    bool success = hotel->findEmergencyRoom(beds, from, to);
+    bool success = hotel->FindEmergencyRoom(beds, from, to);
     if (success) {
         std::cout << "Found an available room for emergency: Room with " << beds << " beds" << std::endl;
     } 
@@ -320,7 +330,7 @@ void HotelApp::processFindEmergencyCommand(const std::vector<std::string>& token
 
     file.close();
 }
-void HotelApp::processUnavailableCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessUnavailableCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -348,13 +358,13 @@ void HotelApp::processUnavailableCommand(const std::vector<std::string>& tokens)
     std::streambuf* coutBuffer = std::cout.rdbuf();
     std::cout.rdbuf(file.rdbuf());
 
-    hotel->declareRoomUnavailable(roomNumber, from, to, note);
+    hotel->DeclareRoomUnavailable(roomNumber, from, to, note);
 
     std::cout.rdbuf(coutBuffer);
 
     file.close();
 }
-void HotelApp::processPrintRoomActivitiesCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessPrintRoomActivitiesCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -377,13 +387,13 @@ void HotelApp::processPrintRoomActivitiesCommand(const std::vector<std::string>&
     std::streambuf* coutBuffer = std::cout.rdbuf();
     std::cout.rdbuf(file.rdbuf());
 
-    hotel->printRoomActivities(roomNumber);
+    hotel->PrintRoomActivities(roomNumber);
 
     std::cout.rdbuf(coutBuffer);
 
     file.close();
 }
-void HotelApp::processPrintActivityGuestsCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessPrintActivityGuestsCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -406,13 +416,13 @@ void HotelApp::processPrintActivityGuestsCommand(const std::vector<std::string>&
     std::streambuf* coutBuffer = std::cout.rdbuf();
     std::cout.rdbuf(file.rdbuf());
 
-    hotel->printActivityGuests(activityName);
+    hotel->PrintActivityGuests(activityName);
 
     std::cout.rdbuf(coutBuffer);
 
     file.close();
 }
-void HotelApp::processPrintRoomsCommand() {
+void HotelApp::ProcessPrintRoomsCommand() {
     if (!isOpen) {
         std::cout << "Error: No hotel is currently open." << std::endl;
         return;
@@ -431,19 +441,19 @@ void HotelApp::processPrintRoomsCommand() {
     std::cout.rdbuf(file.rdbuf());
 
     std::string hotelDataFilename = currentFile;
-    std::vector<std::vector<std::string>> roomData = CSVUtils::readCSVFile(hotelDataFilename);
+    std::vector<std::vector<std::string>> roomData = CSVUtils::ReadCSVFile(hotelDataFilename);
 
     if (roomData.empty()) {
         std::cout << "No room data found." << std::endl;
         return;
     }
-    hotel->printRooms();
+    hotel->PrintRooms();
 
     std::cout.rdbuf(coutBuffer);
 
     file.close();
 }
-void HotelApp::processAddRoomCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessAddRoomCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -457,7 +467,7 @@ void HotelApp::processAddRoomCommand(const std::vector<std::string>& tokens) {
         int roomNumber = std::stoi(tokens[1]);
         int numBeds = std::stoi(tokens[2]);
         Room* room = new Room(roomNumber, numBeds);
-        hotel->addRoom(room);
+        hotel->AddRoom(room);
 
         std::vector<std::vector<std::string>> roomData;
         roomData.push_back({ std::to_string(roomNumber), std::to_string(numBeds) });
@@ -474,20 +484,20 @@ void HotelApp::processAddRoomCommand(const std::vector<std::string>& tokens) {
         std::streambuf* coutBuffer = std::cout.rdbuf();
         std::cout.rdbuf(coutBuffer);
 
-        std::vector<std::vector<std::string>> existingRoomData = CSVUtils::readCSVFile(filename);
+        std::vector<std::vector<std::string>> existingRoomData = CSVUtils::ReadCSVFile(filename);
 
         existingRoomData.insert(existingRoomData.end(), roomData.begin(), roomData.end());
-        CSVUtils::createCSVFile(filename, existingRoomData);
+        CSVUtils::CreateCSVFile(filename, existingRoomData);
         std::cout << "Room " << roomNumber << " with " << numBeds << " beds has been added." << std::endl;
 
         file.close();
     }
     catch (const std::invalid_argument& e) {
         std::cerr << "Error: " << e.what() << std::endl;
-        CSVUtils::clearCSVFiles(currentFile);
+        CSVUtils::ClearCSVFiles(currentFile);
     }
 }
-void HotelApp::processAddActivityCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessAddActivityCommand(const std::vector<std::string>& tokens) {
     try {
         if (!isOpen) {
             std::cout << "No file is currently open." << std::endl;
@@ -498,21 +508,21 @@ void HotelApp::processAddActivityCommand(const std::vector<std::string>& tokens)
             return;
         }
         std::string activityName = tokens[1];
-        hotel->addActivity(activityName);
+        hotel->AddActivity(activityName);
 
         std::string existingFilename = currentFile;
-        std::vector<std::string> previousActivities = CSVUtils::readActivitiesFromCSV(existingFilename);
+        std::vector<std::string> previousActivities = CSVUtils::ReadActivitiesFromCSV(existingFilename);
         previousActivities.push_back(activityName);
 
-        CSVUtils::saveActivitiesToCSV(previousActivities, existingFilename);
+        CSVUtils::SaveActivitiesToCSV(previousActivities, existingFilename);
         std::cout << "Activity " << activityName << " has been added." << std::endl;
     }
     catch (const std::invalid_argument& e) {
         std::cerr << "Error: " << e.what() << std::endl;
-        CSVUtils::clearCSVFiles(currentFile);
+        CSVUtils::ClearCSVFiles(currentFile);
     }
 }
-void HotelApp::processAddGuestToActivityCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessAddGuestToActivityCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -524,7 +534,7 @@ void HotelApp::processAddGuestToActivityCommand(const std::vector<std::string>& 
     std::string activityName = tokens[1];
     std::string guestName = tokens[2];
 
-    Guest* guest = hotel->findGuestByName(guestName);
+    Guest* guest = hotel->FindGuestByName(guestName);
 
     if (guest == nullptr) {
         std::cout << "Guest not found. Please make sure the guest is registered in the hotel." << std::endl;
@@ -543,13 +553,13 @@ void HotelApp::processAddGuestToActivityCommand(const std::vector<std::string>& 
     std::streambuf* coutBuffer = std::cout.rdbuf();
     std::cout.rdbuf(file.rdbuf());
 
-    hotel->addGuestToActivity(activityName, guest);
+    hotel->AddGuestToActivity(activityName, guest);
 
     std::cout.rdbuf(coutBuffer);
 
     file.close();
 }
-void HotelApp::processAddGuestCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessAddGuestCommand(const std::vector<std::string>& tokens) {
     try {
         if (!isOpen) {
             std::cout << "No file is currently open." << std::endl;
@@ -563,7 +573,7 @@ void HotelApp::processAddGuestCommand(const std::vector<std::string>& tokens) {
         std::string lastName = tokens[2];
         std::string phoneNumber = tokens[3];
         Guest* guest = new Guest(firstName, lastName, phoneNumber);
-        hotel->addGuest(guest);
+        hotel->AddGuest(guest);
 
         std::string filename = currentFile;
 
@@ -577,10 +587,10 @@ void HotelApp::processAddGuestCommand(const std::vector<std::string>& tokens) {
         std::streambuf* coutBuffer = std::cout.rdbuf();
         std::cout.rdbuf(file.rdbuf());
 
-        std::vector<std::vector<std::string>> previousGuests = CSVUtils::readGuestsFromCSV(filename);
+        std::vector<std::vector<std::string>> previousGuests = CSVUtils::ReadGuestsFromCSV(filename);
         previousGuests.push_back({ firstName, lastName, phoneNumber });
 
-        CSVUtils::saveGuestsToCSV(previousGuests, filename);
+        CSVUtils::SaveGuestsToCSV(previousGuests, filename);
 
         std::cout.rdbuf(coutBuffer);
 
@@ -590,11 +600,11 @@ void HotelApp::processAddGuestCommand(const std::vector<std::string>& tokens) {
     }
     catch (const std::invalid_argument& e) {
         std::cerr << "Error: " << e.what() << std::endl;
-        CSVUtils::clearCSVFiles(currentFile);
+        CSVUtils::ClearCSVFiles(currentFile);
         return;
     }
 }
-void HotelApp::processPrintGuestsCommand() {
+void HotelApp::ProcessPrintGuestsCommand() {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -611,18 +621,18 @@ void HotelApp::processPrintGuestsCommand() {
     std::cout.rdbuf(file.rdbuf());
 
     std::string guestsFilename = currentFile;
-    std::vector<std::vector<std::string>> guestsData = CSVUtils::readGuestsFromCSV(guestsFilename);
+    std::vector<std::vector<std::string>> guestsData = CSVUtils::ReadGuestsFromCSV(guestsFilename);
 
     if (guestsData.empty()) {
         std::cout << "No guest data found." << std::endl;
         return;
     }
-    hotel->printGuests();
+    hotel->PrintGuests();
 
     std::cout.rdbuf(coutBuffer);
     file.close();
 }
-void HotelApp::processAddRoomActivityCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessAddRoomActivityCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -638,7 +648,7 @@ void HotelApp::processAddRoomActivityCommand(const std::vector<std::string>& tok
 
     Activity* activity = new Activity(activityName);
 
-    hotel->addRoomActivity(roomNumber, activity);
+    hotel->AddRoomActivity(roomNumber, activity);
 
     std::string filename = currentFile;
     std::ofstream file(filename, std::ios::app);
@@ -656,7 +666,7 @@ void HotelApp::processAddRoomActivityCommand(const std::vector<std::string>& tok
     std::cout.rdbuf(coutBuffer);
     file.close();
 }
-void HotelApp::processAddEmergencyRoomCommand(const std::vector<std::string>& tokens) {
+void HotelApp::ProcessAddEmergencyRoomCommand(const std::vector<std::string>& tokens) {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -671,7 +681,7 @@ void HotelApp::processAddEmergencyRoomCommand(const std::vector<std::string>& to
     int numBeds = std::stoi(tokens[2]);
     Room* room = new Room(roomNumber, numBeds);
 
-    hotel->addEmergencyRoom(room);
+    hotel->AddEmergencyRoom(room);
 
     std::string filename = currentFile;
     std::ofstream file(filename, std::ios::app);
@@ -690,13 +700,13 @@ void HotelApp::processAddEmergencyRoomCommand(const std::vector<std::string>& to
 
     file.close();
 }
-void HotelApp::processGetCurrentDateCommand() {
+void HotelApp::ProcessGetCurrentDateCommand() {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
     }
 
-    std::string currentDate = hotel->getCurrentDate();
+    std::string currentDate = hotel->GetCurrentDate();
 
     std::string filename = currentDate;
     std::ofstream file(filename, std::ios::app);
@@ -715,7 +725,7 @@ void HotelApp::processGetCurrentDateCommand() {
 
     file.close();
 }
-void HotelApp::processPrintActivitiesCommand() {
+void HotelApp::ProcessPrintActivitiesCommand() {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
         return;
@@ -733,23 +743,23 @@ void HotelApp::processPrintActivitiesCommand() {
     std::streambuf* coutBuffer = std::cout.rdbuf();
     std::cout.rdbuf(file.rdbuf());
 
-    std::vector<std::string> activityData = CSVUtils::readActivitiesFromCSV(filename);
+    std::vector<std::string> activityData = CSVUtils::ReadActivitiesFromCSV(filename);
 
     if (activityData.empty()) {
         std::cout << "No activity data found." << std::endl;
         return;
     }
 
-    hotel->printActivities();
+    hotel->PrintActivities();
 
     std::cout.rdbuf(coutBuffer);
 
     file.close();
 }
-void HotelApp::processExitCommand() {
+void HotelApp::ProcessExitCommand() {
     if (!isOpen) {
         std::cout << "No file is currently open." << std::endl;
-        CSVUtils::clearCSVFiles(currentFile);
+        CSVUtils::ClearCSVFiles(currentFile);
         std::exit(0);
     }
     
@@ -758,22 +768,22 @@ void HotelApp::processExitCommand() {
     std::cin >> response;
 
     if (response == "yes") {
-        processSaveCommand();
+        ProcessSaveCommand();
         std::cout << "Exiting the program. Goodbye!" << std::endl;
         std::exit(0);
     } 
     else if (response == "no") {
         std::cout << "Exiting the program without saving. Goodbye!" << std::endl;
-        CSVUtils::clearCSVFiles(currentFile);
+        CSVUtils::ClearCSVFiles(currentFile);
         std::exit(0);
     } 
     else {
         std::cout << "Invalid response. Exiting the program without saving. Goodbye!" << std::endl;
-        CSVUtils::clearCSVFiles(currentFile);
+        CSVUtils::ClearCSVFiles(currentFile);
         std::exit(0);
     }
 }
-void HotelApp::processCommand(const std::string& input) {
+void HotelApp::ProcessCommand(const std::string& input) {
     std::istringstream iss(input);
     std::vector<std::string> tokens;
     std::string token;
@@ -786,79 +796,79 @@ void HotelApp::processCommand(const std::string& input) {
     std::string command = tokens[0];
 
     if (command == "open") {
-        processOpenCommand(tokens);
+        ProcessOpenCommand(tokens);
     }
     else if (command == "close") {
-        processCloseCommand();
+        ProcessCloseCommand();
     }
     else if (command == "save") {
-        processSaveCommand();
+        ProcessSaveCommand();
     }
     else if (command == "saveas") {
-        processSaveAsCommand(tokens);
+        ProcessSaveAsCommand(tokens);
     }
     else if (command == "help") {
-        printHelp();
+        PrintHelp();
     }
     else if (command == "checkin") {
-        processCheckinCommand(tokens);
+        ProcessCheckinCommand(tokens);
     }
     else if (command == "checkout") {
-        processCheckoutCommand(tokens);
+        ProcessCheckoutCommand(tokens);
     }
     else if (command == "availability") {
-        processAvailabilityCommand(tokens);
+        ProcessAvailabilityCommand(tokens);
     }
     else if (command == "report") {
-        processReportCommand(tokens);
+        ProcessReportCommand(tokens);
     }
     else if (command == "find") {
-        processFindCommand(tokens);
+        ProcessFindCommand(tokens);
     }
     else if (command == "find!") {
-        processFindEmergencyCommand(tokens);
+        ProcessFindEmergencyCommand(tokens);
     }
     else if (command == "unavailable") {
-        processUnavailableCommand(tokens);
+        ProcessUnavailableCommand(tokens);
     }
     else if (command == "printRoomActivities") {
-        processPrintRoomActivitiesCommand(tokens);
+        ProcessPrintRoomActivitiesCommand(tokens);
     }
     else if (command == "printActivityGuests") {
-        processPrintActivityGuestsCommand(tokens);
+        ProcessPrintActivityGuestsCommand(tokens);
     }
     else if (command == "printRooms") {
-        processPrintRoomsCommand();
+        ProcessPrintRoomsCommand();
     }
     else if (command == "addRoom") {
-        processAddRoomCommand(tokens);
+        ProcessAddRoomCommand(tokens);
     }
     else if (command == "addActivity") {
-        processAddActivityCommand(tokens);
+        ProcessAddActivityCommand(tokens);
     }
     else if (command == "addGuestToActivity") {
-        processAddGuestToActivityCommand(tokens);
+        ProcessAddGuestToActivityCommand(tokens);
     }
     else if (command == "addGuest") {
-        processAddGuestCommand(tokens);
+        ProcessAddGuestCommand(tokens);
     }
     else if (command == "printGuests") {
-        processPrintGuestsCommand();
+        ProcessPrintGuestsCommand();
     }
     else if (command == "addRoomActivity") {
-        processAddRoomActivityCommand(tokens);
+        ProcessAddRoomActivityCommand(tokens);
     }
     else if (command == "addEmergencyRoom") {
-        processAddEmergencyRoomCommand(tokens);
+        ProcessAddEmergencyRoomCommand(tokens);
     }
     else if (command == "getCurrentDate") {
-        processGetCurrentDateCommand();
+        ProcessGetCurrentDateCommand();
     }
     else if (command == "printActivities") {
-        processPrintActivitiesCommand();
+        ProcessPrintActivitiesCommand();
     }
     else if (command == "exit") {
-        processExitCommand();
+        ProcessExitCommand();
     }
     else {
         std::cout << "Invalid command. Type 'help' for a list of supported commands." << std::endl;

@@ -2,37 +2,37 @@
 #include <iostream>
 
 Activity::Activity(const std::string& name) : name(name), accommodation(){
-    if (!isValidName(name)) {
-        throw std::invalid_argument("Invalid name. Name must consist of letters only.");
+    if (!IsValidName(name)) {
+        throw std::invalid_argument("Invalid name. Name must have only letters.");
     }
     if(name.size() > 20){
-        throw std::invalid_argument("Name is longer than it should.");
+        throw std::invalid_argument("Too long name.");
     }
     if(name.size() < 2){
-        throw std::invalid_argument("Name is shorter than it should.");
+        throw std::invalid_argument("Too short name.");
     }
 }
 Activity::~Activity() = default;
-std::string Activity::getName() const {
+std::string Activity::GetName() const {
     return this->name;
 }
-void Activity::setName(const std::string& name) {
+void Activity::SetName(const std::string& name) {
     this->name = name;
 }
-Accommodation& Activity::getAccommodation() {
+Accommodation& Activity::GetAccommodation() {
     return this->accommodation;
 }
-void Activity::setAccommodation(const Accommodation& accommodation) {
+void Activity::SetAccommodation(const Accommodation& accommodation) {
     this->accommodation = accommodation;
 }
-bool Activity::isValidName(const std::string& name) const {
-    for (char c : name) {
-        if (!std::isalpha(c)) {
+bool Activity::IsValidName(const std::string& name) const {
+    for (int i = 0; i < name.size(); i++){
+        if (!std::isalpha(name[i])) {
             return false;
         }
     }
     return true;
 }
-void Activity::addGuest(const Guest& guest) {
-    accommodation.addGuest(guest);
+void Activity::AddGuest(const Guest& guest) {
+    accommodation.AddGuest(guest);
 }

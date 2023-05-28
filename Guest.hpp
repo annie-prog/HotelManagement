@@ -10,17 +10,14 @@ private:
     std::string phoneNumber;
     static std::set<std::string> phoneNumbersSet;
 private:
-    bool isValidName(const std::string& name) const;
-    bool isValidPhoneNumber(const std::string& phoneNumber) const;
+    bool IsValidName(const std::string& name) const;
+    bool IsValidPhoneNumber(const std::string& phoneNumber) const;
 public:
     Guest(const std::string& firstName, const std::string& lastName, const std::string& phoneNumber);
     ~Guest();
-    std::string getFirstName() const;
-    std::string getLastName() const;
-    std::string getPhoneNumber() const;
-
-    /*std::string serialize() const override;
-    void deserialize(const std::string& data) override;*/
+    std::string GetFirstName() const;
+    std::string GetLastName() const;
+    std::string GetPhoneNumber() const;
 };
 
 #ifdef TEST
@@ -31,44 +28,44 @@ public:
 
 TEST_SUITE("Guest") {
     TEST_CASE("Get Guest Information") {
-        Guest guest("John", "Doe", "12345678932");
+        Guest guest("Aneliya", "Konarcheva", "0836475867");
 
-        REQUIRE_EQ(guest.getFirstName(), "John");
-        REQUIRE_EQ(guest.getLastName(), "Doe");
-        REQUIRE_EQ(guest.getPhoneNumber(), "12345678932");
+        REQUIRE_EQ(guest.GetFirstName(), "Aneliya");
+        REQUIRE_EQ(guest.GetLastName(), "Konarcheva");
+        REQUIRE_EQ(guest.GetPhoneNumber(), "0836475867");
     }
 
     TEST_CASE("Invalid First Name") {
         SUBCASE("Empty First Name") {
-            CHECK_THROWS_AS(Guest("", "Doe", "123456789"), std::invalid_argument);
+            CHECK_THROWS_AS(Guest("", "Konarcheva", "0836475867"), std::invalid_argument);
         }
 
         SUBCASE("Whitespace First Name") {
-            CHECK_THROWS_AS(Guest("   ", "Doe", "123456789"), std::invalid_argument);
+            CHECK_THROWS_AS(Guest("   ", "Konarcheva", "0836475867"), std::invalid_argument);
         }
     }
 
     TEST_CASE("Invalid Last Name") {
         SUBCASE("Empty Last Name") {
-            CHECK_THROWS_AS(Guest("John", "", "123456789"), std::invalid_argument);
+            CHECK_THROWS_AS(Guest("Aneliya", "", "0836475867"), std::invalid_argument);
         }
 
         SUBCASE("Whitespace Last Name") {
-            CHECK_THROWS_AS(Guest("John", "   ", "123456789"), std::invalid_argument);
+            CHECK_THROWS_AS(Guest("Aneliya", "   ", "0836475867"), std::invalid_argument);
         }
     }
 
     TEST_CASE("Invalid Phone Number") {
         SUBCASE("Empty Phone Number") {
-            CHECK_THROWS_AS(Guest("John", "Doe", ""), std::invalid_argument);
+            CHECK_THROWS_AS(Guest("Aneliya", "Konarcheva", ""), std::invalid_argument);
         }
 
         SUBCASE("Whitespace Phone Number") {
-            CHECK_THROWS_AS(Guest("John", "Doe", "   "), std::invalid_argument);
+            CHECK_THROWS_AS(Guest("Aneliya", "Konarcheva", "   "), std::invalid_argument);
         }
 
         SUBCASE("Invalid Format") {
-            CHECK_THROWS_AS(Guest("John", "Doe", "1234"), std::invalid_argument);
+            CHECK_THROWS_AS(Guest("Aneliya", "Konarcheva", "1234"), std::invalid_argument);
         }
     }
 }

@@ -20,7 +20,7 @@ int main() {
     test;
 #else*/
     HotelApp hotelApp;
-    hotelApp.run();
+    hotelApp.Run();
 
     return 0;
 

@@ -6,7 +6,7 @@ Accommodation::Accommodation() : guests(nullptr), numGuests(0) {}
 Accommodation::~Accommodation() {
     delete[] this->guests;
 }
-void Accommodation::addGuest(const Guest& guest) {
+void Accommodation::AddGuest(const Guest& guest) {
     Guest** newGuests = new Guest*[numGuests + 1];
 
     for (unsigned int i = 0; i < numGuests; i++) {
@@ -18,19 +18,19 @@ void Accommodation::addGuest(const Guest& guest) {
     guests = newGuests;
     numGuests++;
 }
-Guest** Accommodation::getGuests() const {
+Guest** Accommodation::GetGuests() const {
     return this->guests;
 }
-unsigned int Accommodation::getNumGuests() const {
+unsigned int Accommodation::GetNumGuests() const {
     return this->numGuests;
 }
-void Accommodation::setGuests(Guest** guests) {
+void Accommodation::SetGuests(Guest** guests) {
     this->guests = guests;
 }
-void Accommodation::setNumGuests(unsigned int numGuests) {
+void Accommodation::SetNumGuests(unsigned int numGuests) {
     this->numGuests = numGuests;
 }
-void Accommodation::clearGuests() {
+void Accommodation::ClearGuests() {
     if (guests) {
         delete[] guests;
         guests = nullptr;

@@ -10,12 +10,12 @@ public:
     Activity(const std::string& name);
     ~Activity();
 
-    std::string getName() const;
-    void setName(const std::string& name);
-    Accommodation& getAccommodation();
-    void setAccommodation(const Accommodation& accommodation);
-    bool isValidName(const std::string& name) const;
-    void addGuest(const Guest& guest);
+    std::string GetName() const;
+    void SetName(const std::string& name);
+    Accommodation& GetAccommodation();
+    void SetAccommodation(const Accommodation& accommodation);
+    bool IsValidName(const std::string& name) const;
+    void AddGuest(const Guest& guest);
 };
 
 #ifdef TEST
@@ -25,21 +25,21 @@ TEST_SUITE("Activity") {
     TEST_CASE("Get Name") {
         Activity activity("Swimming");
 
-        CHECK_EQ(activity.getName(), "Swimming");
+        CHECK_EQ(activity.GetName(), "Swimming");
     }
 
     TEST_CASE("Set Name") {
         Activity activity("Swimming");
-        activity.setName("Hiking");
+        activity.SetName("Hiking");
 
-        CHECK_EQ(activity.getName(), "Hiking");
+        CHECK_EQ(activity.GetName(), "Hiking");
     }
 
     TEST_CASE("Valid Name") {
         Activity activity("ValidName");
 
-        CHECK(activity.isValidName("ValidName"));
-        CHECK(activity.isValidName("AnotherValidName"));
+        CHECK(activity.IsValidName("ValidName"));
+        CHECK(activity.IsValidName("AnotherValidName"));
     }
 
     TEST_CASE("Invalid Name: Empty") {
@@ -62,9 +62,9 @@ TEST_SUITE("Activity") {
 
     TEST_CASE("Get Accommodation") {
         Activity activity("Swimming");
-        Accommodation& accommodation = activity.getAccommodation();
+        Accommodation& accommodation = activity.GetAccommodation();
 
-        CHECK_EQ(&accommodation, &activity.getAccommodation());
+        CHECK_EQ(&accommodation, &activity.GetAccommodation());
     }
 }
 #endif
