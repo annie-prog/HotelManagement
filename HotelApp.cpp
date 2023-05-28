@@ -59,7 +59,8 @@ void HotelApp::ProcessCloseCommand() {
     }
     std::cout << "Successfully closed " << currentFile << std::endl;
     isOpen = false;
-    currentFile = "";
+    //currentFile = "";
+    CSVUtils::ClearCSVFiles(currentFile);
 }
 void HotelApp::ProcessSaveCommand() {
     if (!isOpen) {
