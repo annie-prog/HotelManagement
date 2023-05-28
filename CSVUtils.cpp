@@ -5,11 +5,10 @@
 void CSVUtils::SaveGuestsToCSV(const std::vector<std::vector<std::string>>& guests, const std::string& filename) {
     std::ofstream file(filename);
 
-    if (!file.is_open()) {
+    if (!file.is_open()) { // Checks if the file is not open
         std::cout << "Error with opening the file" << std::endl;
         return;
     }
-
     for (const auto& guest : guests) {
         for (size_t i = 0; i < guest.size(); i++) {
             file << guest[i];
@@ -19,14 +18,13 @@ void CSVUtils::SaveGuestsToCSV(const std::vector<std::vector<std::string>>& gues
         }
         file << std::endl;
     }
-
-    file.close();
+    file.close(); // Close the file
 }
 std::vector<std::vector<std::string>> CSVUtils::ReadGuestsFromCSV(const std::string& filename) {
     std::vector<std::vector<std::string>> guests;
     std::ifstream file(filename);
 
-    if (!file.is_open()) {
+    if (!file.is_open()) { // Checks if the file is not open
         std::cout << "Error with opening the file!" << filename << std::endl;
         return guests;
     }
@@ -37,18 +35,16 @@ std::vector<std::vector<std::string>> CSVUtils::ReadGuestsFromCSV(const std::str
         size_t start = 0;
         size_t end = line.find(',');
 
+        // Parse each comma-separated value in the line
         while (end != std::string::npos) {
             guest.push_back(line.substr(start, end - start));
             start = end + 1;
             end = line.find(',', start);
         }
-
-        guest.push_back(line.substr(start));
+        guest.push_back(line.substr(start)); // Add the last value in the line
         guests.push_back(guest);
     }
-
-    file.close();
-
+    file.close(); // Close the file
     return guests;
 }
 void CSVUtils::PrintGuests(const std::vector<std::vector<std::string>>& guests) {
@@ -61,16 +57,13 @@ void CSVUtils::PrintGuests(const std::vector<std::vector<std::string>>& guests) 
 }
 void CSVUtils::SaveActivitiesToCSV(const std::vector<std::string>& activities, const std::string& filename) {
     std::ofstream file(filename);
-
-    if (!file.is_open()) {
+    if (!file.is_open()) { // Checks if the file is not open
         std::cout << "Error with opening the file " << filename << std::endl;
         return;
     }
-
     for (const auto& activity : activities) {
         file << activity << ",\n";
     }
-
     file.close();
 }
 std::vector<std::string> CSVUtils::ReadActivitiesFromCSV(const std::string& filename) {
@@ -81,15 +74,13 @@ std::vector<std::string> CSVUtils::ReadActivitiesFromCSV(const std::string& file
         std::cout << "Error with opening the file " << filename << std::endl;
         return {};
     }
-
     std::string line;
     while (std::getline(file, line)) {
-        if (!line.empty() && line.back() == ',') {
-            line.pop_back();
+        if (!line.empty() && line.back() == ',') { // Checks if the line ends with a comma
+            line.pop_back(); // Removes the comma
         }
         activities.push_back(line);
     }
-
     file.close();
     return activities;
 }
@@ -100,14 +91,12 @@ void CSVUtils::SaveReservationsToCSV(const std::vector<std::vector<std::string>>
         std::cout << "Error with opening the file " << filename << std::endl;
         return;
     }
-
     for (const auto& reservation : reservations) {
         for (const auto& field : reservation) {
-            file << field << ",";
+            file << field << ","; // Writes each field followed by a comma
         }
-        file << "\n";
+        file << "\n"; // Adds a new line after each reservation
     }
-
     file.close();
 }
 std::vector<std::vector<std::string>> CSVUtils::ReadReservationsFromCSV(const std::string& filename) {
@@ -118,7 +107,6 @@ std::vector<std::vector<std::string>> CSVUtils::ReadReservationsFromCSV(const st
         std::cout << "Error with opening the file " << filename << std::endl;
         return reservations;
     }
-
     std::string line;
     while (std::getline(file, line)) {
         std::vector<std::string> reservation;
@@ -126,12 +114,11 @@ std::vector<std::vector<std::string>> CSVUtils::ReadReservationsFromCSV(const st
         std::string field;
 
         while (std::getline(iss, field, ',')) {
-            reservation.push_back(field);
+            reservation.push_back(field); // Add each field to the reservation vector
         }
 
         reservations.push_back(reservation);
     }
-
     file.close();
     return reservations;
 }
@@ -150,14 +137,12 @@ void CSVUtils::CreateCSVFile(const std::string& filename, const std::vector<std:
         std::cout << "Error opening file: " << filename << std::endl;
         return;
     }
-
     for (const auto& row : data) {
         for (const auto& field : row) {
             file << field << ",";
         }
         file << "\n";
     }
-
     file.close();
 }
 std::vector<std::vector<std::string>> CSVUtils::ReadCSVFile(const std::string& filename) {
@@ -168,7 +153,6 @@ std::vector<std::vector<std::string>> CSVUtils::ReadCSVFile(const std::string& f
         std::cout << "Error opening file: " << filename << std::endl;
         return data;
     }
-
     std::string line;
     while (std::getline(file, line)) {
         std::vector<std::string> row;
@@ -176,12 +160,11 @@ std::vector<std::vector<std::string>> CSVUtils::ReadCSVFile(const std::string& f
         std::string field;
 
         while (std::getline(iss, field, ',')) {
-            row.push_back(field);
+            row.push_back(field); // Add each field to the row vector
         }
 
         data.push_back(row);
     }
-
     file.close();
     return data;
 }
@@ -195,5 +178,5 @@ void CSVUtils::PrintCSVData(const std::vector<std::vector<std::string>>& data) {
 }
 void CSVUtils::ClearCSVFiles(const std::string& filename) {
     std::ofstream file(filename);
-    file.close();
+    file.close(); // Create an empty file or overwrite existing file with an empty content
 }

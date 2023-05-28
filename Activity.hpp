@@ -14,8 +14,8 @@ public:
     void SetName(const std::string& name);
     Accommodation& GetAccommodation();
     void SetAccommodation(const Accommodation& accommodation);
-    bool IsValidName(const std::string& name) const;
-    void AddGuest(const Guest& guest);
+    bool IsValidName(const std::string& name) const; // Checking if name of activity is valid
+    void AddGuest(const Guest& guest); // Method to add a guest to the accommodation
 };
 
 #ifdef TEST

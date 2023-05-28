@@ -8,10 +8,10 @@ private:
     std::string firstName;
     std::string lastName;
     std::string phoneNumber;
-    static std::set<std::string> phoneNumbersSet;
+    static std::set<std::string> phoneNumbersSet; // Static set to store unique phone numbers
 private:
-    bool IsValidName(const std::string& name) const;
-    bool IsValidPhoneNumber(const std::string& phoneNumber) const;
+    bool IsValidName(const std::string& name) const; // Checking if the any name is valid
+    bool IsValidPhoneNumber(const std::string& phoneNumber) const; // Checking if phone number is valid
 public:
     Guest(const std::string& firstName, const std::string& lastName, const std::string& phoneNumber);
     ~Guest();

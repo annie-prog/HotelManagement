@@ -8,17 +8,17 @@ class Room{
 private:
     int number;
     unsigned int numBeds;
-    Reservation** reservations;
+    Reservation** reservations; // Array of pointers to Reservation objects
     unsigned int reservationsCount;
-    Activity** activities;
+    Activity** activities; // Array of pointers to Activity objects
     unsigned int activitiesCount;
-    Accommodation** accommodations;
+    Accommodation** accommodations; // Array of pointers to Accommodation objects
     unsigned int accommodationsCount;
-    Guest** guests;
+    Guest** guests; // Array of pointers to Guest objects
     unsigned int guestsCount;
 public:
     Room();
-    Room(int number, unsigned int numBeds);
+    Room(int number, unsigned int numBeds); // Constructor with room number and number of beds
     ~Room();
 
     int GetNumber() const;
@@ -36,24 +36,24 @@ public:
     Accommodation** GetAccommodations() const;
     unsigned int GetAccommodationsCount() const;
 
-    void AddReservation(const Reservation& reservation);
-    void AddActivity(const Activity& activity);
-    void AddGuest(const Guest& guest);
+    void AddReservation(const Reservation& reservation); // Adds a reservation to the room
+    void AddActivity(const Activity& activity); // Adds an activity to the room
+    void AddGuest(const Guest& guest); // Adds a guest to the room
 
-    bool IsReservedInPeriod(const std::string& from, const std::string& to) const;
-    void AddGuestToActivity(const std::string& activityName, Guest* guest);
-    void ClearGuests();
-    void ClearReservations();
+    bool IsReservedInPeriod(const std::string& from, const std::string& to) const; // Checks if the room is reserved within a period
+    void AddGuestToActivity(const std::string& activityName, Guest* guest); // Adds a guest to an activity
+    void ClearGuests(); // Clear all guests from the room
+    void ClearReservations(); // Clear all reservations from the room
     void Checkout();
 
-    void PrintRoomUsageReport(const std::string& from, const std::string& to) const;
-    int GetUsageDays(const std::string& from, const std::string& to) const;
-    void MoveGuestsFromRoom(Room* sourceRoom);
+    void PrintRoomUsageReport(const std::string& from, const std::string& to) const; // Print a room usage report for a specified period
+    int GetUsageDays(const std::string& from, const std::string& to) const; // Get the number of usage days for a specified period
+    void MoveGuestsFromRoom(Room* sourceRoom); // Move guests from another room to this room
 
-    bool IsReservedOnDate(const std::string& currentDate) const;
+    bool IsReservedOnDate(const std::string& currentDate) const; // Check if the room is reserved on a specific date
 
-    Guest* FindGuestByName(const std::string& guestName) const;
-    void PrintActivities() const;
+    Guest* FindGuestByName(const std::string& guestName) const; // Find a guest in the room by first name
+    void PrintActivities() const; // Print the activities in the room
 };
 
 #ifdef TEST

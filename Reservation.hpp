@@ -12,9 +12,9 @@ private:
     std::string note;  
     Accommodation accommodation; 
 public:
-    Reservation(const std::string& checkInDate, const std::string& checkOutDate);
-    Reservation(const std::string& checkInDate, const std::string& checkOutDate, const std::string& note);
-    Reservation(int roomNumber, const std::string& checkInDate, const std::string& checkOutDate, const std::string& note);
+    Reservation(const std::string& checkInDate, const std::string& checkOutDate); // Constructor with check-in and check-out dates
+    Reservation(const std::string& checkInDate, const std::string& checkOutDate, const std::string& note); // Constructor with check-in and check-out dates and a note
+    Reservation(int roomNumber, const std::string& checkInDate, const std::string& checkOutDate, const std::string& note); // Constructor with room number, check-in and check-out dates, and a note
     ~Reservation();
 
     int GetRoomNumber() const;
@@ -32,10 +32,10 @@ public:
     Guest** GetGuests() const;
     int GetNumGuests() const;
 
-    bool IncludesDate(const std::string& currentDate) const;
+    bool IncludesDate(const std::string& currentDate) const; // Check if the reservation includes a given date
 
-    bool IsValidDate(const std::string& date);
-    bool IsValidRoomNumber(int roomNumber) const;
+    bool IsValidDate(const std::string& date); // Check if any date is valid using format ISO 8601.
+    bool IsValidRoomNumber(int roomNumber) const; // Check if a room number is valid
 
     Accommodation& GetAccommodation();
 };

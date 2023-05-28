@@ -3,8 +3,8 @@
 
 class Accommodation {
 private:
-    Guest** guests;
-    unsigned int numGuests;
+    Guest** guests; // Array of pointers to Guest objects
+    unsigned int numGuests; // Number of guests
 public:
     Accommodation();
     ~Accommodation();
@@ -14,7 +14,7 @@ public:
     
     void SetGuests(Guest** guests);
     void SetNumGuests(unsigned int numGuests);
-    void ClearGuests();
+    void ClearGuests(); // Method to clear guests array
 };
 
 #ifdef TEST

@@ -3,10 +3,9 @@
 
 class HotelApp{
 private:
-    std::string currentFile;
-    bool isOpen = false;
-    HotelSystem* hotel;
-
+    std::string currentFile; // Stores the current file being accessed
+    bool isOpen = false; // Indicates whether the file is open or not
+    HotelSystem* hotel; // Pointer to the HotelSystem object
 public:
     HotelApp();
     void Run();
